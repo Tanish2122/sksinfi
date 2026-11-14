@@ -96,100 +96,63 @@ export const authenticFooterHtml = `<style>
         <p class="txtnew mb-0">E-1006, Titanium City Centre<br>Near Sachin Tower<br>Anand Nagar Road<br>Ahmedabad - 380015</p>
       </div>
 
-      <!-- Column 2: MSME Solutions -->
-      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">MSME Solutions</h6>
-        <ul class="list-unstyled footer-service-list">
-          <li><a href="/msme"><i class="fa fa-chevron-right"></i><span>MSME For India</span></a></li>
-          <li><a href="/msme/why-sks-infi"><i class="fa fa-chevron-right"></i><span>Why SKS INFI</span></a></li>
-          <li><a href="/msme/financial-solutions"><i class="fa fa-chevron-right"></i><span>MSME Financial</span></a></li>
-          <li><a href="/msme/registration"><i class="fa fa-chevron-right"></i><span>MSME Registration</span></a></li>
-          <li><a href="/msme/subsidy-schemes"><i class="fa fa-chevron-right"></i><span>Subsidy Schemes</span></a></li>
-          <li><a href="/msme/ipo-listing"><i class="fa fa-chevron-right"></i><span>MSME IPO &amp; Listing</span></a></li>
-          <li><a href="/msme/invoice-discounting"><i class="fa fa-chevron-right"></i><span>Invoice Discounting</span></a></li>
-          <li><a href="/msme/growth-solutions"><i class="fa fa-chevron-right"></i><span>Growth Solutions</span></a></li>
-          <li><a href="/msme/venture-capital"><i class="fa fa-chevron-right"></i><span>Venture Capital &amp; PE</span></a></li>
-          <li><a href="/msme/cgtmse"><i class="fa fa-chevron-right"></i><span>CGTMSE &amp; MSME</span></a></li>
-        </ul>
-      </div>
-
-      <!-- Column 3: Loans -->
-      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Loans</h6>
-        <ul class="list-unstyled footer-service-list">
-          <li><a href="/loan"><i class="fa fa-chevron-right"></i><span>SKS INFI &amp; Loan</span></a></li>
-          <li><a href="/home_loan"><i class="fa fa-chevron-right"></i><span>Home Loan</span></a></li>
-          <li><a href="/lap"><i class="fa fa-chevron-right"></i><span>LAP</span></a></li>
-          <li><a href="/personal-loan"><i class="fa fa-chevron-right"></i><span>Personal Loan</span></a></li>
-          <li><a href="/business-loan"><i class="fa fa-chevron-right"></i><span>Business Loan</span></a></li>
-          <li><a href="/education"><i class="fa fa-chevron-right"></i><span>Education Loan</span></a></li>
-          <li><a href="/term-loan"><i class="fa fa-chevron-right"></i><span>Term Loan</span></a></li>
-          <li><a href="/cas_overdraft"><i class="fa fa-chevron-right"></i><span>Cash Credit</span></a></li>
-          <li><a href="/project_finance"><i class="fa fa-chevron-right"></i><span>Project Finance</span></a></li>
-          <li><a href="/cgtsme"><i class="fa fa-chevron-right"></i><span>CGTMSE</span></a></li>
-          <li><a href="/msme/subsidy-schemes"><i class="fa fa-chevron-right"></i><span>MSME Subsidy Schemes</span></a></li>
-          <li><a href="/car"><i class="fa fa-chevron-right"></i><span>Car Loan</span></a></li>
-          <li><a href="/commercial_vehicle"><i class="fa fa-chevron-right"></i><span>Commercial Vehicle</span></a></li>
-        </ul>
-      </div>
-
-      <!-- Column 4: NRI Desk & Real Estate -->
-      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">NRI Desk</h6>
-        <ul class="list-unstyled footer-service-list mb-4">
-          <li><a href="/sksinfi_nri"><i class="fa fa-chevron-right"></i><span>SKS INFI &amp; NRI</span></a></li>
-          <li><a href="/loan"><i class="fa fa-chevron-right"></i><span>Loan</span></a></li>
-          <li><a href="/real_estate"><i class="fa fa-chevron-right"></i><span>Real Estate</span></a></li>
-          <li><a href="/investment"><i class="fa fa-chevron-right"></i><span>Investment</span></a></li>
-          <li><a href="/insurance"><i class="fa fa-chevron-right"></i><span>Insurance</span></a></li>
-          <li><a href="/accountstax"><i class="fa fa-chevron-right"></i><span>Tax &amp; Compliances</span></a></li>
-        </ul>
-
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Real Estate</h6>
-        <ul class="list-unstyled footer-service-list">
-          <li><a href="/residential"><i class="fa fa-chevron-right"></i><span>Residential</span></a></li>
-          <li><a href="/commercial"><i class="fa fa-chevron-right"></i><span>Commercial</span></a></li>
-          <li><a href="/industrial"><i class="fa fa-chevron-right"></i><span>Industrial</span></a></li>
-          <li><a href="/farm_house"><i class="fa fa-chevron-right"></i><span>Farm House</span></a></li>
-          <li><a href="/open_land"><i class="fa fa-chevron-right"></i><span>Open Land</span></a></li>
-        </ul>
-      </div>
-
-      <!-- Column 5: Investment & Insurance -->
+      <!-- Column 2: Investment -->
       <div class="col-6 col-md-3 col-lg-4 col-xl-2">
         <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Investment</h6>
-        <ul class="list-unstyled footer-service-list mb-4">
-          <li><a href="/mutual_funds"><i class="fa fa-chevron-right"></i><span>Mutual Fund</span></a></li>
-          <li><a href="/bonds"><i class="fa fa-chevron-right"></i><span>Bonds</span></a></li>
-          <li><a href="/ncd"><i class="fa fa-chevron-right"></i><span>NCD</span></a></li>
-          <li><a href="/unlisted_shares"><i class="fa fa-chevron-right"></i><span>Unlisted Shares</span></a></li>
-          <li><a href="/equity_demat"><i class="fa fa-chevron-right"></i><span>Equity &amp; Demat</span></a></li>
-          <li><a href="/fixed-deposit"><i class="fa fa-chevron-right"></i><span>Fixed Deposit</span></a></li>
-        </ul>
-
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Insurance</h6>
         <ul class="list-unstyled footer-service-list">
-          <li><a href="/health"><i class="fa fa-chevron-right"></i><span>Health Insurance</span></a></li>
-          <li><a href="/life"><i class="fa fa-chevron-right"></i><span>Life Insurance</span></a></li>
-          <li><a href="/term"><i class="fa fa-chevron-right"></i><span>Term Insurance</span></a></li>
-          <li><a href="/property"><i class="fa fa-chevron-right"></i><span>Property Insurance</span></a></li>
-          <li><a href="/travel"><i class="fa fa-chevron-right"></i><span>Travel Insurance</span></a></li>
-          <li><a href="/factory"><i class="fa fa-chevron-right"></i><span>Factory Insurance</span></a></li>
+          <li><a href="/why_investment"><i class="fa fa-chevron-right"></i><span>Why Investment</span></a></li>
+          <li><a href="/mutual_funds"><i class="fa fa-chevron-right"></i><span>Mutual Fund &amp; SIP</span></a></li>
+          <li><a href="/ncd"><i class="fa fa-chevron-right"></i><span>Non Convertible Debentures (NCDs)</span></a></li>
+          <li><a href="/bonds"><i class="fa fa-chevron-right"></i><span>Govt. Securities (G-Secs)</span></a></li>
+          <li><a href="/unlisted_shares"><i class="fa fa-chevron-right"></i><span>Unlisted Shares</span></a></li>
+          <li><a href="/fixed-deposit"><i class="fa fa-chevron-right"></i><span>Fixed Deposit</span></a></li>
+          <li><a href="/equity_demat"><i class="fa fa-chevron-right"></i><span>Equity &amp; Debt</span></a></li>
         </ul>
       </div>
 
-      <!-- Column 6: Tax & Compliances + Quick Links -->
+      <!-- Column 3: Insurance -->
+      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
+        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Insurance</h6>
+        <ul class="list-unstyled footer-service-list">
+          <li><a href="/why_insurance"><i class="fa fa-chevron-right"></i><span>Why Insurance</span></a></li>
+          <li><a href="/health"><i class="fa fa-chevron-right"></i><span>Health Insurance</span></a></li>
+          <li><a href="/life"><i class="fa fa-chevron-right"></i><span>Term &amp; Life Insurance</span></a></li>
+          <li><a href="/general"><i class="fa fa-chevron-right"></i><span>General Insurance</span></a></li>
+          <li><a href="/factory"><i class="fa fa-chevron-right"></i><span>Factory Insurance</span></a></li>
+          <li><a href="/property"><i class="fa fa-chevron-right"></i><span>Property Insurance</span></a></li>
+          <li><a href="/stock"><i class="fa fa-chevron-right"></i><span>Stock Insurance</span></a></li>
+          <li><a href="/general"><i class="fa fa-chevron-right"></i><span>Workmen Insurance</span></a></li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Tax & Compliances -->
       <div class="col-6 col-md-3 col-lg-4 col-xl-2">
         <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Tax &amp; Compliances</h6>
-        <ul class="list-unstyled footer-service-list mb-4">
-          <li><a href="/accounts"><i class="fa fa-chevron-right"></i><span>Accounts</span></a></li>
-          <li><a href="/taxation"><i class="fa fa-chevron-right"></i><span>Taxation</span></a></li>
-          <li><a href="/gst"><i class="fa fa-chevron-right"></i><span>GST</span></a></li>
-          <li><a href="/itr"><i class="fa fa-chevron-right"></i><span>ITR</span></a></li>
-          <li><a href="/litigation"><i class="fa fa-chevron-right"></i><span>Litigation</span></a></li>
-          <li><a href="/accountstax"><i class="fa fa-chevron-right"></i><span>Compliance Advisory</span></a></li>
+        <ul class="list-unstyled footer-service-list">
+          <li><a href="/itr"><i class="fa fa-chevron-right"></i><span>ITR &amp; Audit</span></a></li>
+          <li><a href="/gst"><i class="fa fa-chevron-right"></i><span>GST Registration</span></a></li>
+          <li><a href="/accounts"><i class="fa fa-chevron-right"></i><span>Firm &amp; Co. Set-up</span></a></li>
+          <li><a href="/taxation"><i class="fa fa-chevron-right"></i><span>Statutory Compliances</span></a></li>
+          <li><a href="/litigation"><i class="fa fa-chevron-right"></i><span>Insolvency Audit</span></a></li>
+          <li><a href="/accountstax"><i class="fa fa-chevron-right"></i><span>Forensic Audit</span></a></li>
         </ul>
+      </div>
 
+      <!-- Column 5: Real Estate -->
+      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
+        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Real Estate</h6>
+        <ul class="list-unstyled footer-service-list">
+          <li><a href="/why-jaipur"><i class="fa fa-chevron-right"></i><span>Why Jaipur</span></a></li>
+          <li><a href="/residential"><i class="fa fa-chevron-right"></i><span>Residential (Plots, Villa &amp; Flats)</span></a></li>
+          <li><a href="/commercial"><i class="fa fa-chevron-right"></i><span>Commercial Offices</span></a></li>
+          <li><a href="/industrial"><i class="fa fa-chevron-right"></i><span>Industrial Properties &amp; Warehouses</span></a></li>
+          <li><a href="/farm_house"><i class="fa fa-chevron-right"></i><span>Farm Houses &amp; Out Houses</span></a></li>
+          <li><a href="/open_land"><i class="fa fa-chevron-right"></i><span>Approved Open Land</span></a></li>
+        </ul>
+      </div>
+      
+      <!-- Column 6: Quick Links -->
+      <div class="col-6 col-md-3 col-lg-4 col-xl-2">
         <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Quick Links</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/about"><i class="fa fa-chevron-right"></i><span>About SKS INFI</span></a></li>
