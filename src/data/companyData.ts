@@ -12,6 +12,7 @@ export const companyInfo = {
   state: "Rajasthan",
   pincode: "302018",
   googleReviewsUrl: "https://www.google.com/search?sca_esv=1a73dd2439b22e8b&sxsrf=AKL5yDiSx1k2AP034JvjVFlEc5Iyhmba6w:1794722001009&q=sks+infi+jaipur+reviews&si=AE1YtOqu-FqC0k5URYML-DLmSNmCJ-h2DaZ4dTodKoIRJsEpjBWvGqnoNtedPtCb_y7nS3P4DsU_xiwXD9O5EXjjjAfIMUqYKiiVQqmgDAL-KEU_TdPG30XDoYTqjp08l9pmilsE30YX&sa=X&ved=2ahUKEwi6rty6pImYAxWibWwGHUAuCoQQyNoBKAB6BAg1EAA&ictx=1&biw=1920&bih=957&dpr=1",
+  googleWriteReviewUrl: "https://g.page/r/CdZoXMwcYOnMEBM/review",
   whatsappUrl: "https://wa.me/919928529222?text=Hello%20SKS%20INFI%2C%20I%20would%20like%20to%20enquire%20about%20financial%20services.",
   mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113911.2381289133!2d75.7196627!3d26.8851417!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396c4adf4c57e281%3A0xce1c63a0cf22e09!2sJaipur%2C%20Rajasthan!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin",
   stats: [
