@@ -1,7 +1,4 @@
 <style>
-  .logoheight {
-    height: 90px !important;
-  }
   .footer-service-list li {
     margin-bottom: 7px;
     display: flex;
@@ -33,88 +30,98 @@
   }
   .txtnew {
     color: #cbd5e1 !important;
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.5;
   }
   .clricn {
     color: #b69455 !important;
   }
   .footer-heading {
-    font-size: 14px;
+    font-size: 13.5px;
     letter-spacing: 0.5px;
     position: relative;
-    padding-bottom: 8px;
+    padding-bottom: 7px;
+    margin-bottom: 14px;
+    white-space: nowrap;
   }
   .footer-heading::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 24px;
+    width: 22px;
     height: 2px;
     background: #b69455;
     border-radius: 2px;
   }
+
+  /* 7-column desktop grid */
+  .footer-main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px 20px;
+  }
+
+  @media (min-width: 576px) {
+    .footer-main-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .footer-main-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .footer-main-grid {
+      grid-template-columns: 1.35fr 1.05fr 1.05fr 1fr 1fr 1fr 1fr;
+      gap: 16px;
+    }
+  }
 </style>
 
 <footer class="text-light pt-5 pb-4" style="background: #094b57;">
-  <div class="container">
+  <div class="container-fluid px-3 px-xl-5" style="max-width: 1440px;">
+    <div class="footer-main-grid">
 
-    <!-- TIER 1: Company Profile, Contact, 3 Offices & Quick Links -->
-    <div class="row gy-4 mb-4 pb-4" style="border-bottom: 1px solid rgba(182, 148, 85, 0.25);">
-      <!-- Left: Logo & Contact -->
-      <div class="col-12 col-md-6 col-lg-3">
-        <img src="/img/sksl.jpg" alt="SKS Infi" class="mb-3" style="width: 155px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <!-- Column 1: Logo + Contact + Offices -->
+      <div class="footer-col-brand">
+        <img src="/img/sksl.jpg" alt="SKS Infi" class="mb-3" style="width: 145px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+
         <div class="d-flex align-items-start mb-2">
-          <i class="fa fa-phone clricn me-2 mt-1" style="font-size: 13px; flex-shrink: 0;"></i>
+          <i class="fa fa-phone clricn me-2 mt-1" style="font-size: 12px; flex-shrink: 0;"></i>
           <div class="d-flex flex-column" style="gap: 2px;">
             <a href="tel:+919928529222" class="text-decoration-none txtnew text-nowrap">+91 99285 29222</a>
             <a href="tel:+919928593122" class="text-decoration-none txtnew text-nowrap">+91 99285 93122</a>
           </div>
         </div>
-        <div class="d-flex align-items-center">
-          <i class="fa fa-envelope clricn me-2" style="font-size: 13px; flex-shrink: 0;"></i>
+
+        <div class="d-flex align-items-center mb-3">
+          <i class="fa fa-envelope clricn me-2" style="font-size: 12px; flex-shrink: 0;"></i>
           <a href="mailto:infi@sksinfi.com" class="text-decoration-none txtnew text-nowrap">infi@sksinfi.com</a>
+        </div>
+
+        <div class="office-box mb-2">
+          <h6 class="fw-bold text-white footer-heading mb-1 text-uppercase" style="font-size: 12px;">RAJASTHAN OFFICE</h6>
+          <p class="txtnew mb-2">520, 5th Floor<br>Sunny Trade Centre<br>New Aatish Market<br>Jaipur - 302020</p>
+        </div>
+
+        <div class="office-box mb-2">
+          <h6 class="fw-bold text-white footer-heading mb-1 text-uppercase" style="font-size: 12px;">DELHI OFFICE</h6>
+          <p class="txtnew mb-2">Surya Kiran Building<br>KG Marg, Connaught Place<br>New Delhi - 110001</p>
+        </div>
+
+        <div class="office-box">
+          <h6 class="fw-bold text-white footer-heading mb-1 text-uppercase" style="font-size: 12px;">GUJARAT OFFICE</h6>
+          <p class="txtnew mb-0">E-1006, Titanium City Centre<br>Near Sachin Tower<br>Anand Nagar Road<br>Ahmedabad - 380015</p>
         </div>
       </div>
 
-      <!-- Rajasthan Office -->
-      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
-        <h6 class="fw-bold text-white footer-heading mb-2 text-uppercase" style="font-size: 12.5px;">RAJASTHAN OFFICE</h6>
-        <p class="txtnew mb-0">520, 5th Floor<br>Sunny Trade Centre<br>New Aatish Market<br>Jaipur - 302020</p>
-      </div>
-
-      <!-- Delhi Office -->
-      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
-        <h6 class="fw-bold text-white footer-heading mb-2 text-uppercase" style="font-size: 12.5px;">DELHI OFFICE</h6>
-        <p class="txtnew mb-0">Surya Kiran Building<br>KG Marg, Connaught Place<br>New Delhi - 110001</p>
-      </div>
-
-      <!-- Gujarat Office -->
-      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
-        <h6 class="fw-bold text-white footer-heading mb-2 text-uppercase" style="font-size: 12.5px;">GUJARAT OFFICE</h6>
-        <p class="txtnew mb-0">E-1006, Titanium City Centre<br>Near Sachin Tower<br>Anand Nagar Road<br>Ahmedabad - 380015</p>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
-        <h6 class="fw-bold text-white footer-heading mb-2 text-uppercase" style="font-size: 12.5px;">QUICK LINKS</h6>
-        <ul class="list-unstyled footer-service-list d-flex flex-wrap mb-0" style="gap: 8px 16px;">
-          <li><a href="/about"><i class="fa fa-chevron-right"></i><span>About SKS INFI</span></a></li>
-          <li><a href="/contact"><i class="fa fa-chevron-right"></i><span>Contact Us</span></a></li>
-          <li><a href="/partner-with-us"><i class="fa fa-chevron-right"></i><span>Partner With Us</span></a></li>
-          <li><a href="/blogs"><i class="fa fa-chevron-right"></i><span>Financial Blogs</span></a></li>
-          <li><a href="/sitemap.xml" target="_blank"><i class="fa fa-chevron-right"></i><span>Sitemap</span></a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- TIER 2: 6 Dedicated Services Columns -->
-    <div class="row gy-4 gx-3 gx-xl-4">
-
-      <!-- Col 1: Retail Loan -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Retail Loan</h6>
+      <!-- Column 2: Retail Loan -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">Retail Loan</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/home_loan"><i class="fa fa-chevron-right"></i><span>Home Loan</span></a></li>
           <li><a href="/lap"><i class="fa fa-chevron-right"></i><span>Loan Against Property</span></a></li>
@@ -129,9 +136,9 @@
         </ul>
       </div>
 
-      <!-- Col 2: MSME -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">MSME</h6>
+      <!-- Column 3: MSME -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">MSME</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/msme/subsidy-schemes"><i class="fa fa-chevron-right"></i><span>MSME Subsidy &amp; Incentive</span></a></li>
           <li><a href="/msme/financial-solutions"><i class="fa fa-chevron-right"></i><span>MSME Loan &amp; Financial Solutions</span></a></li>
@@ -143,9 +150,9 @@
         </ul>
       </div>
 
-      <!-- Col 3: Real Estate -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Real Estate</h6>
+      <!-- Column 4: Real Estate -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">Real Estate</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/why-jaipur"><i class="fa fa-chevron-right"></i><span>Why Jaipur</span></a></li>
           <li><a href="/residential"><i class="fa fa-chevron-right"></i><span>Residential (Plots, Villa &amp; Flats)</span></a></li>
@@ -156,9 +163,9 @@
         </ul>
       </div>
 
-      <!-- Col 4: Investment -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Investment</h6>
+      <!-- Column 5: Investment -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">Investment</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/why_investment"><i class="fa fa-chevron-right"></i><span>Why Investment</span></a></li>
           <li><a href="/mutual_funds"><i class="fa fa-chevron-right"></i><span>Mutual Fund &amp; SIP</span></a></li>
@@ -170,9 +177,9 @@
         </ul>
       </div>
 
-      <!-- Col 5: Insurance -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Insurance</h6>
+      <!-- Column 6: Insurance -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">Insurance</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/why_insurance"><i class="fa fa-chevron-right"></i><span>Why Insurance</span></a></li>
           <li><a href="/health"><i class="fa fa-chevron-right"></i><span>Health Insurance</span></a></li>
@@ -185,9 +192,9 @@
         </ul>
       </div>
 
-      <!-- Col 6: Tax & Compliances -->
-      <div class="col-6 col-md-4 col-xl-2">
-        <h6 class="fw-bold mb-3 text-uppercase text-white footer-heading">Tax &amp; Compliances</h6>
+      <!-- Column 7: Tax & Compliances -->
+      <div>
+        <h6 class="fw-bold text-uppercase text-white footer-heading">Tax &amp; Compliances</h6>
         <ul class="list-unstyled footer-service-list">
           <li><a href="/itr"><i class="fa fa-chevron-right"></i><span>ITR &amp; Audit</span></a></li>
           <li><a href="/gst"><i class="fa fa-chevron-right"></i><span>GST Registration</span></a></li>
@@ -202,12 +209,29 @@
   </div>
 </footer>
 
+<!-- Bottom Bar: Copyright, Quick Links & Social Icons -->
 <div class="text-light py-3" style="background-color: #03363D; border-top: 1px solid rgba(255,255,255,0.08);">
-  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-    <div class="text-center text-md-start mb-2 mb-md-0">
-      <p style="color: #94a3b8 !important; margin-bottom: 0; font-size: 13.5px;">&copy; Copyright 2025 - SKS INFI. All Rights Reserved.</p>
+  <div class="container-fluid px-3 px-xl-5 d-flex flex-column flex-lg-row justify-content-between align-items-center" style="max-width: 1440px; gap: 12px;">
+    <!-- Left: Copyright -->
+    <div class="text-center text-lg-start">
+      <p style="color: #94a3b8 !important; margin-bottom: 0; font-size: 13px;">&copy; Copyright 2025 - SKS INFI. All Rights Reserved.</p>
     </div>
-    <div class="text-center text-md-end">
+
+    <!-- Center: Quick Links -->
+    <div class="d-flex flex-wrap justify-content-center align-items-center" style="gap: 6px 16px;">
+      <a href="/about" class="text-decoration-none" style="color: #cbd5e1; font-size: 12.5px;">About SKS INFI</a>
+      <span style="color: rgba(255,255,255,0.2);">|</span>
+      <a href="/contact" class="text-decoration-none" style="color: #cbd5e1; font-size: 12.5px;">Contact Us</a>
+      <span style="color: rgba(255,255,255,0.2);">|</span>
+      <a href="/partner-with-us" class="text-decoration-none" style="color: #cbd5e1; font-size: 12.5px;">Partner With Us</a>
+      <span style="color: rgba(255,255,255,0.2);">|</span>
+      <a href="/blogs" class="text-decoration-none" style="color: #cbd5e1; font-size: 12.5px;">Financial Blogs</a>
+      <span style="color: rgba(255,255,255,0.2);">|</span>
+      <a href="/sitemap.xml" target="_blank" class="text-decoration-none" style="color: #cbd5e1; font-size: 12.5px;">Sitemap</a>
+    </div>
+
+    <!-- Right: Social Icons -->
+    <div class="text-center text-lg-end">
       <a href="https://www.facebook.com/profile.php?id=61580467109664" target="_blank" class="text-light me-3 fs-6" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
       <a href="https://www.instagram.com/sksinfi/" class="text-light me-3 fs-6" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
       <a href="https://www.youtube.com/@sksinfi" class="text-light fs-6 me-3" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
