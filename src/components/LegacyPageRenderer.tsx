@@ -902,7 +902,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
 
       const updateSlider = (animate = true) => {
         const visible = getVisibleCount();
-        const maxIndex = totalSlides - visible;
+        const maxIndex = getMaxIndex();
         if (currentIndex > maxIndex) currentIndex = 0;
         if (currentIndex < 0) currentIndex = maxIndex;
 
@@ -916,8 +916,9 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
         testimonialTrack.style.transition = animate ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)" : "none";
         testimonialTrack.style.transform = `translateX(-${offset}px)`;
 
+        const activeDotIdx = visible === 2 ? Math.floor(currentIndex / 2) : currentIndex;
         dots.forEach((dot, idx) => {
-          if (idx === currentIndex) {
+          if (idx === activeDotIdx) {
             dot.classList.add("active");
           } else {
             dot.classList.remove("active");
@@ -926,14 +927,18 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       };
 
       const goNext = () => {
+        const visible = getVisibleCount();
         const maxIndex = getMaxIndex();
-        currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+        const step = visible;
+        currentIndex = currentIndex + step > maxIndex ? 0 : currentIndex + step;
         updateSlider();
       };
 
       const goPrev = () => {
+        const visible = getVisibleCount();
         const maxIndex = getMaxIndex();
-        currentIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
+        const step = visible;
+        currentIndex = currentIndex - step < 0 ? Math.floor(maxIndex / step) * step : currentIndex - step;
         updateSlider();
       };
 
@@ -955,7 +960,8 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
         if (!(dot as any)._bound) {
           (dot as any)._bound = true;
           dot.addEventListener("click", () => {
-            currentIndex = idx;
+            const visible = getVisibleCount();
+            currentIndex = visible === 2 ? idx * 2 : idx;
             updateSlider();
           });
         }
