@@ -77,6 +77,15 @@ export const companyInfo = {
       rating: 5,
       comment: "CA Aarun Jain advised comprehensive coverage for 8 years. After a friend's accident at a non-cashless hospital led to a ₹1.72 Lakh deduction, I connected with SKS INFI and shifted to HDFC ERGO for proper cashless cover. Really the best health insurance & financial advisor in India.",
       service: "Health Insurance • Cashless Cover"
+    },
+    {
+      id: "5",
+      name: "वीरेंद्र शाह (Virendra Shah)",
+      location: "Ahmedabad, Gujarat",
+      role: "TATA AIA Guaranteed Term Policy Client",
+      rating: 5,
+      comment: "रात 10:00 बजे WhatsApp वीडियो कॉल पर SKS INFI के प्रतिनिधि के गहन विश्लेषण व प्रेजेंटेशन से प्रभावित होकर मैंने TATA AIA की ₹3 करोड़ की गारंटीड टर्म पॉलिसी ली, जो 65 वर्ष बाद मनी बैक लाभ के साथ रिटायरमेंट भी सुरक्षित करती है। SKS INFI की रिसर्च व प्रेजेंटेशन वास्तव में लाजवाब है!",
+      service: "Term Insurance • TATA AIA ₹3 Cr"
     }
   ],
   faqs: [
