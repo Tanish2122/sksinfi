@@ -49,8 +49,7 @@ export const companyInfo = {
       role: "NRI Client & Investor",
       rating: 5,
       comment: "While living in Australia, I was looking to purchase a property in Jaipur. Team SKS INFI understood my requirement, showed suitable properties via live video calls, initiated loan pre-approval, and in just 5 days completed registration! Dedicated, transparent, and prompt—truly the best financial planner in India.",
-      service: "NRI Property & Home Loan",
-      originalDoc: "/images/testimonials/testimonial-ns-shekhawat.jpg"
+      service: "NRI Property & Home Loan"
     },
     {
       id: "2",
@@ -59,8 +58,7 @@ export const companyInfo = {
       role: "Textile Dyeing & Printing Entrepreneur",
       rating: 5,
       comment: "जब मैंने नौकरी छोड़कर अपना व्यापार शुरू करने की सोची, CA Aarun Jain जी ने 45 मिनट में रूप-रेखा तैयार कर नए फर्म का रजिस्ट्रेशन, प्रोजेक्ट रिपोर्ट, उद्योग भवन सब्सिडी (27 दिन में स्वीकृत) व सरकारी बैंक से लोन (35 दिन में स्वीकृत) दिलवाया। आज कंपनी का सालाना टर्नओवर ₹8.00 करोड़ (2026) है। वे वास्तव में बहुत प्रोफेशनल व एक्सपर्ट MSME कंसल्टेंट हैं।",
-      service: "MSME Setup, Subsidy & Loan",
-      originalDoc: "/images/testimonials/testimonial-pankaj-srimeli.jpg"
+      service: "MSME Setup, Subsidy & Loan"
     },
     {
       id: "3",
@@ -69,8 +67,7 @@ export const companyInfo = {
       role: "Retired Employee",
       rating: 5,
       comment: "SKS INFI के माध्यम से ₹31 लाख में करार मुक्त ज़मीन खरीदी जिसकी आज कीमत ₹40 लाख है। इसके साथ ही श्रीमती प्रीति जैन के मार्गदर्शन पर HDFC ERGO हेल्थ इंश्योरेंस लिया जिसने आँख की आपातकालीन बीमारी में अहमदाबाद ज़ेनिथ हॉस्पिटल में ₹10.63 लाख के इलाज में अमूल्य सहायता दी। SKS INFI वास्तव में एक बहुत ही प्रोफेशनल एडवाइजरी फर्म है।",
-      service: "Real Estate & Health Insurance",
-      originalDoc: "/images/testimonials/testimonial-prakash-ranka.jpg"
+      service: "Real Estate & Health Insurance"
     },
     {
       id: "4",
@@ -79,8 +76,7 @@ export const companyInfo = {
       role: "Business Entrepreneurs",
       rating: 5,
       comment: "CA Piyush Jain regularly advised us to take comprehensive coverage. After an accident where a non-cashless hospital led to huge out-of-pocket expenses and a ₹1.72 Lakh deduction from Care Health, we immediately connected with SKS INFI and ported to HDFC ERGO with proper cashless coverage. A knowledgeable financial advisor makes all the difference.",
-      service: "HDFC ERGO Cashless Health Cover",
-      originalDoc: "/images/testimonials/testimonial-jitendra-ayush-jain.jpg"
+      service: "HDFC ERGO Cashless Health Cover"
     }
   ],
   faqs: [
