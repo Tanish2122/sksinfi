@@ -2602,21 +2602,24 @@ html {
   bottom: 30%;
   right: 0;
   background: linear-gradient(135deg, #094b57 0%, #b69455 100%);
-  color: #ffffff;
-  padding: 0.4rem 0.8rem;
-  font-size: 12.5px;
-  font-weight: 600;
-  border-radius: 8px 0 0 8px;
+  color: #ffffff !important;
+  padding: 4px 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  border-radius: 6px 0 0 6px !important;
   cursor: pointer;
-  box-shadow: -3px 5px 14px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  box-shadow: -2px 3px 8px rgba(0, 0, 0, 0.18);
+  transition: transform 0.25s ease;
+  display: inline-flex;
+  align-items: center;
 }
 #loan-popup-toggle i {
-  font-size: 11.5px;
-  margin-right: 6px;
+  font-size: 9.5px !important;
+  margin-right: 4px !important;
 }
 #loan-popup-toggle:hover {
-  transform: translateX(-4px);
+  transform: translateX(-3px);
 }
 #loan-popup-container {
   z-index: 9999;
