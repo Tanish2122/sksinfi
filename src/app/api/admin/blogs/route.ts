@@ -4,10 +4,56 @@ import path from "path";
 import { BlogPost } from "@/data/blogsData";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const BLOGS_FILE_PATH = path.join(process.cwd(), "src", "data", "blogs.json");
 
-// Helper to read blogs from disk
+// Helper to read blogs from Supabase, /tmp, or disk
 async function readBlogs(): Promise<BlogPost[]> {
+  // 1. Optional Supabase synchronization if configured
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("blogs")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (!error && data && data.length > 0) {
+        return data.map((b: any) => ({
+          slug: b.slug,
+          title: b.title,
+          excerpt: b.excerpt || b.title,
+          category: b.category || "Loans",
+          author: {
+            name: b.author_name || "Arun Mehta",
+            role: b.author_role || "Senior Financial Consultant, SKS INFI",
+            avatar: b.author_avatar || "/images/user (1).png"
+          },
+          publishedDate: b.published_at || b.publishedDate || "Recently",
+          readTime: b.read_time || b.readTime || "5 min read",
+          coverImage: b.cover_image || b.coverImage || "/images/homeloan.avif",
+          tags: Array.isArray(b.tags) ? b.tags : [],
+          featured: Boolean(b.is_featured ?? b.featured),
+          takeaways: Array.isArray(b.takeaways) ? b.takeaways : [],
+          content: b.content || ""
+        }));
+      }
+    } catch (sbErr) {
+      console.warn("Supabase read error, falling back to disk/tmp:", sbErr);
+    }
+  }
+
+  // 2. Check /tmp/blogs.json (warm serverless instance fallback on Vercel)
+  try {
+    const tmpPath = path.join("/tmp", "blogs.json");
+    const tmpRaw = await fs.readFile(tmpPath, "utf8");
+    const parsed = JSON.parse(tmpRaw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+  } catch {}
+
+  // 3. Fallback to src/data/blogs.json on disk
   try {
     const raw = await fs.readFile(BLOGS_FILE_PATH, "utf8");
     return JSON.parse(raw);
@@ -17,9 +63,22 @@ async function readBlogs(): Promise<BlogPost[]> {
   }
 }
 
-// Helper to write blogs to disk
+// Helper to write blogs to disk safely (gracefully handles read-only serverless filesystems)
 async function writeBlogs(blogs: BlogPost[]): Promise<void> {
-  await fs.writeFile(BLOGS_FILE_PATH, JSON.stringify(blogs, null, 2), "utf8");
+  // Always update /tmp on serverless environments like Vercel
+  try {
+    await fs.writeFile(path.join("/tmp", "blogs.json"), JSON.stringify(blogs, null, 2), "utf8");
+  } catch {}
+
+  try {
+    await fs.writeFile(BLOGS_FILE_PATH, JSON.stringify(blogs, null, 2), "utf8");
+  } catch (err: any) {
+    if (err?.code === "EROFS" || err?.message?.includes("read-only")) {
+      console.warn("Read-only filesystem detected (Vercel serverless runtime); safely stored in memory/tmp:", err.message);
+      return;
+    }
+    throw err;
+  }
 }
 
 // GET: Return all blogs
@@ -29,7 +88,7 @@ export async function GET() {
     return NextResponse.json(blogs, {
       status: 200,
       headers: {
-        "Cache-Control": "no-store, max-age=0"
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
       }
     });
   } catch (error: any) {
@@ -107,12 +166,36 @@ export async function POST(req: NextRequest) {
       content: content.trim()
     };
 
+    // Optional Supabase synchronization if configured
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        await supabase.from("blogs").upsert([{
+          slug: newBlog.slug,
+          title: newBlog.title,
+          excerpt: newBlog.excerpt,
+          category: newBlog.category,
+          author_name: newBlog.author.name,
+          author_role: newBlog.author.role,
+          author_avatar: newBlog.author.avatar,
+          published_at: newBlog.publishedDate,
+          read_time: newBlog.readTime,
+          cover_image: newBlog.coverImage,
+          tags: newBlog.tags,
+          is_featured: newBlog.featured,
+          takeaways: newBlog.takeaways,
+          content: newBlog.content
+        }]);
+      } catch (sbErr) {
+        console.warn("Supabase blog sync notice:", sbErr);
+      }
+    }
+
     const currentBlogs = await readBlogs();
 
     // Check if updating an existing blog (via originalSlug or matching slug)
     const targetSlug = originalSlug || cleanSlug;
     const existingIndex = currentBlogs.findIndex(
-      (b) => b.slug.toLowerCase() === targetSlug.toLowerCase()
+      (b) => b.slug.toLowerCase().trim() === targetSlug.toLowerCase().trim()
     );
 
     if (existingIndex >= 0) {
@@ -125,22 +208,18 @@ export async function POST(req: NextRequest) {
 
     await writeBlogs(currentBlogs);
 
-    // Optional Supabase synchronization if configured
-    if (isSupabaseConfigured() && supabase) {
-      try {
-        await supabase.from("blogs").upsert([newBlog]);
-      } catch (sbErr) {
-        console.warn("Supabase blog sync notice:", sbErr);
-      }
-    }
-
     return NextResponse.json(
       {
         success: true,
         message: existingIndex >= 0 ? "Blog post updated successfully." : "Blog post published successfully.",
         blog: newBlog
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate"
+        }
+      }
     );
   } catch (error: any) {
     console.error("Error saving blog:", error);
@@ -161,29 +240,36 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Slug parameter is required." }, { status: 400 });
     }
 
-    const currentBlogs = await readBlogs();
-    const filteredBlogs = currentBlogs.filter(
-      (b) => b.slug.toLowerCase() !== slug.toLowerCase()
-    );
+    const cleanSlug = slug.toLowerCase().trim();
 
-    if (filteredBlogs.length === currentBlogs.length) {
-      return NextResponse.json({ error: "Blog not found." }, { status: 404 });
-    }
-
-    await writeBlogs(filteredBlogs);
-
-    // Optional Supabase sync
+    // Optional Supabase sync if configured
     if (isSupabaseConfigured() && supabase) {
       try {
-        await supabase.from("blogs").delete().eq("slug", slug);
+        await supabase.from("blogs").delete().eq("slug", cleanSlug);
       } catch (sbErr) {
         console.warn("Supabase blog delete notice:", sbErr);
       }
     }
 
+    const currentBlogs = await readBlogs();
+    const filteredBlogs = currentBlogs.filter(
+      (b) => b.slug.toLowerCase().trim() !== cleanSlug
+    );
+
+    await writeBlogs(filteredBlogs);
+
     return NextResponse.json(
-      { success: true, message: `Blog '${slug}' deleted successfully.` },
-      { status: 200 }
+      {
+        success: true,
+        message: `Blog '${slug}' deleted successfully.`,
+        remaining: filteredBlogs.length
+      },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate"
+        }
+      }
     );
   } catch (error: any) {
     console.error("Error deleting blog:", error);

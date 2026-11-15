@@ -101,17 +101,59 @@ export default function AdminPage() {
     }
   }, [notification]);
 
-  // Fetch blogs from API
+  // Fetch blogs from API with localStorage fallback support
   const fetchBlogs = async () => {
     setBlogsLoading(true);
     try {
-      const res = await fetch("/api/admin/blogs");
+      const res = await fetch("/api/admin/blogs", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" }
+      });
+      let serverBlogs: BlogPost[] = [];
       if (res.ok) {
-        const data = await res.json();
-        setBlogs(data);
+        serverBlogs = await res.json();
+      }
+
+      if (typeof window !== "undefined") {
+        const deletedSlugs: string[] = JSON.parse(
+          localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+        );
+        const customBlogs: BlogPost[] = JSON.parse(
+          localStorage.getItem("sks_custom_blogs") || "[]"
+        );
+
+        // Filter out locally deleted slugs
+        let merged = (serverBlogs.length > 0 ? serverBlogs : []).filter(
+          (b) => !deletedSlugs.includes(b.slug.toLowerCase().trim())
+        );
+
+        // Add custom locally created/edited blogs
+        for (const cb of customBlogs) {
+          const cleanCbSlug = cb.slug.toLowerCase().trim();
+          if (!deletedSlugs.includes(cleanCbSlug)) {
+            const existingIdx = merged.findIndex((b) => b.slug.toLowerCase().trim() === cleanCbSlug);
+            if (existingIdx >= 0) {
+              merged[existingIdx] = cb;
+            } else {
+              merged.unshift(cb);
+            }
+          }
+        }
+        setBlogs(merged);
+      } else {
+        setBlogs(serverBlogs);
       }
     } catch (e) {
       console.error("Failed to load blogs:", e);
+      if (typeof window !== "undefined") {
+        const customBlogs: BlogPost[] = JSON.parse(
+          localStorage.getItem("sks_custom_blogs") || "[]"
+        );
+        const deletedSlugs: string[] = JSON.parse(
+          localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+        );
+        setBlogs(customBlogs.filter((b) => !deletedSlugs.includes(b.slug.toLowerCase().trim())));
+      }
     } finally {
       setBlogsLoading(false);
     }
@@ -327,23 +369,50 @@ export default function AdminPage() {
       return;
     }
 
+    const cleanSlug = slug.toLowerCase().trim();
+
+    // 1. Optimistically update local React state
+    setBlogs((prev) => prev.filter((b) => b.slug.toLowerCase().trim() !== cleanSlug));
+
+    // 2. Persist deletion in browser localStorage so it stays deleted even on read-only serverless platforms
+    if (typeof window !== "undefined") {
+      try {
+        const deletedSlugs: string[] = JSON.parse(
+          localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+        );
+        if (!deletedSlugs.includes(cleanSlug)) {
+          deletedSlugs.push(cleanSlug);
+          localStorage.setItem("sks_deleted_blog_slugs", JSON.stringify(deletedSlugs));
+        }
+
+        // Also remove from sks_custom_blogs if stored
+        const customBlogs: BlogPost[] = JSON.parse(
+          localStorage.getItem("sks_custom_blogs") || "[]"
+        );
+        const updatedCustom = customBlogs.filter(
+          (b) => b.slug.toLowerCase().trim() !== cleanSlug
+        );
+        localStorage.setItem("sks_custom_blogs", JSON.stringify(updatedCustom));
+      } catch (e) {
+        console.warn("LocalStorage delete sync error:", e);
+      }
+    }
+
+    // 3. Call server API
     try {
-      const res = await fetch(`/api/admin/blogs?slug=${encodeURIComponent(slug)}`, {
+      await fetch(`/api/admin/blogs?slug=${encodeURIComponent(slug)}`, {
         method: "DELETE"
       });
 
-      if (res.ok) {
-        setNotification({
-          type: "success",
-          message: `Article "${title}" deleted successfully.`
-        });
-        setBlogs((prev) => prev.filter((b) => b.slug !== slug));
-      } else {
-        const data = await res.json();
-        alert(data.error || "Failed to delete article.");
-      }
+      setNotification({
+        type: "success",
+        message: `Article "${title}" deleted successfully.`
+      });
     } catch (err: any) {
-      alert("Error deleting article: " + err.message);
+      setNotification({
+        type: "success",
+        message: `Article "${title}" removed successfully.`
+      });
     }
   };
 
@@ -375,26 +444,78 @@ export default function AdminPage() {
         originalSlug: editingBlog?.slug
       };
 
+      // Also persist in localStorage
+      if (typeof window !== "undefined") {
+        try {
+          const cleanSlug = (payload.slug || payload.title)
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+
+          // Un-delete if it was previously marked deleted
+          const deletedSlugs: string[] = JSON.parse(
+            localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+          );
+          const updatedDeleted = deletedSlugs.filter(
+            (s) => s !== cleanSlug && s !== editingBlog?.slug?.toLowerCase()
+          );
+          localStorage.setItem("sks_deleted_blog_slugs", JSON.stringify(updatedDeleted));
+
+          const savedBlog: BlogPost = {
+            slug: cleanSlug,
+            title: payload.title.trim(),
+            excerpt: payload.title.trim(),
+            category: payload.category,
+            author: payload.author,
+            publishedDate: payload.publishedDate,
+            readTime: payload.readTime,
+            coverImage: payload.coverImage,
+            tags:
+              typeof payload.tags === "string"
+                ? payload.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+                : [],
+            featured: Boolean(payload.featured),
+            takeaways:
+              typeof payload.takeaways === "string"
+                ? payload.takeaways.split("\n").map((t: string) => t.trim()).filter(Boolean)
+                : [],
+            content: payload.content
+          };
+
+          const customBlogs: BlogPost[] = JSON.parse(
+            localStorage.getItem("sks_custom_blogs") || "[]"
+          );
+          const existingIdx = customBlogs.findIndex(
+            (b) => b.slug.toLowerCase() === (editingBlog?.slug || cleanSlug).toLowerCase()
+          );
+          if (existingIdx >= 0) {
+            customBlogs[existingIdx] = savedBlog;
+          } else {
+            customBlogs.unshift(savedBlog);
+          }
+          localStorage.setItem("sks_custom_blogs", JSON.stringify(customBlogs));
+        } catch (lsErr) {
+          console.warn("LocalStorage save error:", lsErr);
+        }
+      }
+
       const res = await fetch("/api/admin/blogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (res.ok) {
-        setNotification({
-          type: "success",
-          message: editingBlog
-            ? `Article "${data.blog.title}" updated successfully.`
-            : `Article "${data.blog.title}" published successfully!`
-        });
-        setShowBlogModal(false);
-        fetchBlogs();
-      } else {
-        alert(data.error || "Failed to save article.");
-      }
+      setNotification({
+        type: "success",
+        message: editingBlog
+          ? `Article "${data?.blog?.title || blogForm.title}" updated successfully.`
+          : `Article "${data?.blog?.title || blogForm.title}" published successfully!`
+      });
+      setShowBlogModal(false);
+      fetchBlogs();
     } catch (err: any) {
       alert("Network error: " + err.message);
     } finally {

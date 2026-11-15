@@ -32,7 +32,22 @@ export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClien
   const [modalCategory, setModalCategory] = useState<string | undefined>(post.category);
   const [copied, setCopied] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [isDeleted, setIsDeleted] = useState(false);
   const articleRef = useRef<HTMLDivElement>(null);
+
+  // Check if blog was deleted locally
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const deletedSlugs: string[] = JSON.parse(
+          localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+        );
+        if (deletedSlugs.includes(post.slug.toLowerCase().trim())) {
+          setIsDeleted(true);
+        }
+      } catch {}
+    }
+  }, [post.slug]);
 
   // Reading progress bar
   useEffect(() => {
@@ -56,6 +71,33 @@ export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClien
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  if (isDeleted) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white text-[#333333]">
+        <Navbar onOpenEnquiry={() => setModalOpen(true)} />
+        <main className="flex-1 flex items-center justify-center py-20 px-4">
+          <div className="max-w-md mx-auto text-center bg-slate-50 border border-slate-200 rounded-2xl p-8 shadow-sm">
+            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <HelpCircle className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-bold text-slate-800 mb-2">Article Removed</h1>
+            <p className="text-slate-500 text-sm mb-6">
+              This blog article has been removed from SKS INFI.
+            </p>
+            <Link
+              href="/blogs"
+              className="inline-flex items-center justify-center gap-2 bg-[#094b57] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#073842] transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Explore All Blogs</span>
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const currentUrl = "https://www.sksinfi.com/blogs/" + post.slug;
   const encodedTitle = encodeURIComponent(post.title);

@@ -2,6 +2,8 @@ import React from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import fs from "fs";
+import path from "path";
 import { BLOGS_DATA, getBlogPostBySlug, BlogPost } from "@/data/blogsData";
 import SingleBlogClient from "./SingleBlogClient";
 
@@ -11,6 +13,21 @@ interface PageProps {
 
 export const dynamicParams = true;
 
+function resolveBlogPost(slug: string): BlogPost | undefined {
+  const clean = slug.replace(/\.php$/, "").toLowerCase().trim();
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", "blogs.json");
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const diskBlogs: BlogPost[] = JSON.parse(raw);
+      if (Array.isArray(diskBlogs)) {
+        return diskBlogs.find((b) => b.slug.toLowerCase().trim() === clean);
+      }
+    }
+  } catch {}
+  return getBlogPostBySlug(slug);
+}
+
 export async function generateStaticParams() {
   return BLOGS_DATA.map((post) => ({
     slug: post.slug,
@@ -19,7 +36,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = resolveBlogPost(slug);
 
   if (!post) {
     return {
@@ -63,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SingleBlogPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = resolveBlogPost(slug);
 
   if (!post) {
     notFound();
