@@ -462,6 +462,17 @@ export default function Navbar({ onOpenEnquiry }: NavbarProps = {}) {
               >
                 <i className="fa-brands fa-x-twitter"></i>
               </a>
+              <a
+                href="https://www.google.com/search?sca_esv=1a73dd2439b22e8b&sxsrf=AKL5yDiSx1k2AP034JvjVFlEc5Iyhmba6w:1794722001009&q=sks+infi+jaipur+reviews&si=AE1YtOqu-FqC0k5URYML-DLmSNmCJ-h2DaZ4dTodKoIRJsEpjBWvGqnoNtedPtCb_y7nS3P4DsU_xiwXD9O5EXjjjAfIMUqYKiiVQqmgDAL-KEU_TdPG30XDoYTqjp08l9pmilsE30YX&sa=X&ved=2ahUKEwi6rty6pImYAxWibWwGHUAuCoQQyNoBKAB6BAg1EAA&ictx=1&biw=1920&bih=957&dpr=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Google Reviews"
+                title="Google Reviews"
+                style={{ color: "#ffffff", textDecoration: "none" }}
+                className="hover:text-[#f5cb68] transition-colors duration-150 text-[12.5px] flex items-center justify-center"
+              >
+                <i className="fab fa-google"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -1056,6 +1067,17 @@ export default function Navbar({ onOpenEnquiry }: NavbarProps = {}) {
                     className="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-[#003840] hover:border-[#003840] flex items-center justify-center transition-colors text-xs"
                   >
                     <i className="fa-brands fa-x-twitter"></i>
+                  </a>
+                  <a
+                    href="https://www.google.com/search?sca_esv=1a73dd2439b22e8b&sxsrf=AKL5yDiSx1k2AP034JvjVFlEc5Iyhmba6w:1794722001009&q=sks+infi+jaipur+reviews&si=AE1YtOqu-FqC0k5URYML-DLmSNmCJ-h2DaZ4dTodKoIRJsEpjBWvGqnoNtedPtCb_y7nS3P4DsU_xiwXD9O5EXjjjAfIMUqYKiiVQqmgDAL-KEU_TdPG30XDoYTqjp08l9pmilsE30YX&sa=X&ved=2ahUKEwi6rty6pImYAxWibWwGHUAuCoQQyNoBKAB6BAg1EAA&ictx=1&biw=1920&bih=957&dpr=1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Google Reviews"
+                    title="Google Reviews"
+                    style={{ textDecoration: "none" }}
+                    className="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-[#003840] hover:border-[#003840] flex items-center justify-center transition-colors text-xs"
+                  >
+                    <i className="fab fa-google"></i>
                   </a>
                 </div>
               </div>
