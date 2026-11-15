@@ -44,39 +44,43 @@ export const companyInfo = {
   testimonials: [
     {
       id: "1",
-      name: "Rajesh Sharma",
-      location: "Jaipur, Rajasthan",
-      role: "Textile Manufacturer",
+      name: "NS Shekhawat",
+      location: "Australia / Jaipur",
+      role: "NRI Client & Investor",
       rating: 5,
-      comment: "SKS INFI helped us secure a ₹2.5 Crore MSME working capital loan within just 5 days when other banks were taking weeks. Their team handled all legal documentation seamlessly.",
-      service: "MSME Business Loan"
+      comment: "While living in Australia, I was looking to purchase a property in Jaipur. Team SKS INFI understood my requirement, showed suitable properties via live video calls, initiated loan pre-approval, and in just 5 days completed registration! Dedicated, transparent, and prompt—truly the best financial planner in India.",
+      service: "NRI Property & Home Loan",
+      originalDoc: "/images/testimonials/testimonial-ns-shekhawat.jpg"
     },
     {
       id: "2",
-      name: "Pooja Khandelwal",
-      location: "Malviya Nagar, Jaipur",
-      role: "Software Architect",
+      name: "Pankaj Srimeli",
+      location: "Sanganer, Jaipur",
+      role: "Textile Dyeing & Printing Entrepreneur",
       rating: 5,
-      comment: "Got my Home Loan sanctioned at the lowest 8.4% interest rate with zero processing headache. SKS INFI compared 6 different banks and picked the perfect lender for me.",
-      service: "Home Loan"
+      comment: "जब मैंने नौकरी छोड़कर अपना व्यापार शुरू करने की सोची, CA Aarun Jain जी ने 45 मिनट में रूप-रेखा तैयार कर नए फर्म का रजिस्ट्रेशन, प्रोजेक्ट रिपोर्ट, उद्योग भवन सब्सिडी (27 दिन में स्वीकृत) व सरकारी बैंक से लोन (35 दिन में स्वीकृत) दिलवाया। आज कंपनी का सालाना टर्नओवर ₹8.00 करोड़ (2026) है। वे वास्तव में बहुत प्रोफेशनल व एक्सपर्ट MSME कंसल्टेंट हैं।",
+      service: "MSME Setup, Subsidy & Loan",
+      originalDoc: "/images/testimonials/testimonial-pankaj-srimeli.jpg"
     },
     {
       id: "3",
-      name: "Vikramaditya Rathore",
-      location: "Dubai / Jaipur",
-      role: "NRI Entrepreneur",
+      name: "Prakash Ranka (प्रकाश रांका)",
+      location: "Jaipur, Rajasthan",
+      role: "Retired Employee",
       rating: 5,
-      comment: "Managing real estate investments and repatriation from the UAE used to be complex until I partnered with SKS INFI. Their NRI advisory team is prompt, transparent, and trustworthy.",
-      service: "NRI Wealth Advisory"
+      comment: "SKS INFI के माध्यम से ₹31 लाख में करार मुक्त ज़मीन खरीदी जिसकी आज कीमत ₹40 लाख है। इसके साथ ही श्रीमती प्रीति जैन के मार्गदर्शन पर HDFC ERGO हेल्थ इंश्योरेंस लिया जिसने आँख की आपातकालीन बीमारी में अहमदाबाद ज़ेनिथ हॉस्पिटल में ₹10.63 लाख के इलाज में अमूल्य सहायता दी। SKS INFI वास्तव में एक बहुत ही प्रोफेशनल एडवाइजरी फर्म है।",
+      service: "Real Estate & Health Insurance",
+      originalDoc: "/images/testimonials/testimonial-prakash-ranka.jpg"
     },
     {
       id: "4",
-      name: "Anil Mathur",
-      location: "Vaishali Nagar, Jaipur",
-      role: "Chartered Accountant",
+      name: "Jitendra Jain & Ayush Jain",
+      location: "Jaipur, Rajasthan",
+      role: "Business Entrepreneurs",
       rating: 5,
-      comment: "I regularly refer my clients to SKS INFI for loan against property and debt syndication. Their professionalism, transparent terms, and deep banking relations are unmatched.",
-      service: "Loan Against Property"
+      comment: "CA Piyush Jain regularly advised us to take comprehensive coverage. After an accident where a non-cashless hospital led to huge out-of-pocket expenses and a ₹1.72 Lakh deduction from Care Health, we immediately connected with SKS INFI and ported to HDFC ERGO with proper cashless coverage. A knowledgeable financial advisor makes all the difference.",
+      service: "HDFC ERGO Cashless Health Cover",
+      originalDoc: "/images/testimonials/testimonial-jitendra-ayush-jain.jpg"
     }
   ],
   faqs: [
