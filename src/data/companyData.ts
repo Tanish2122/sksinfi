@@ -86,6 +86,15 @@ export const companyInfo = {
       rating: 5,
       comment: "रात 10:00 बजे WhatsApp वीडियो कॉल पर SKS INFI के प्रतिनिधि के गहन विश्लेषण व प्रेजेंटेशन से प्रभावित होकर मैंने TATA AIA की ₹3 करोड़ की गारंटीड टर्म पॉलिसी ली, जो 65 वर्ष बाद मनी बैक लाभ के साथ रिटायरमेंट भी सुरक्षित करती है। SKS INFI की रिसर्च व प्रेजेंटेशन वास्तव में लाजवाब है!",
       service: "Term Insurance • TATA AIA ₹3 Cr"
+    },
+    {
+      id: "6",
+      name: "CA Umang Jain",
+      location: "India",
+      role: "Chartered Accountant | Mutual Fund & SIP Portfolio (> ₹1.00 Cr)",
+      rating: 5,
+      comment: "Managing our ₹1.00+ Cr mutual fund and SIP portfolio previously yielded only 8%-9% returns. Under SKS INFI's research and diversification across sectors, large-cap, mid-cap, and small-cap funds, my portfolio has achieved a CAGR of over 15% over the last 3 years. Truly one of the most professional financial advisors in India.",
+      service: "Mutual Funds & SIP Planning"
     }
   ],
   faqs: [
