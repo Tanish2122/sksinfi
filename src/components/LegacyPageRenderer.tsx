@@ -878,6 +878,102 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       sliderTimers.push(timer);
     });
 
+    // 6. Testimonials Slider with Arrow Navigation
+    const testimonialTrack = document.getElementById("testimonialTrack") as HTMLElement | null;
+    const prevBtns = [
+      document.getElementById("testimonialPrevBtn"),
+      document.getElementById("testimonialPrevFloat"),
+      document.getElementById("testimonialPrevBtnBottom"),
+    ].filter(Boolean) as HTMLElement[];
+    const nextBtns = [
+      document.getElementById("testimonialNextBtn"),
+      document.getElementById("testimonialNextFloat"),
+      document.getElementById("testimonialNextBtnBottom"),
+    ].filter(Boolean) as HTMLElement[];
+    const dots = Array.from(document.querySelectorAll(".testimonial-dot")) as HTMLElement[];
+
+    if (testimonialTrack) {
+      const slides = Array.from(testimonialTrack.querySelectorAll(".testimonial-slide-item")) as HTMLElement[];
+      const totalSlides = slides.length;
+      let currentIndex = 0;
+
+      const getVisibleCount = () => (window.innerWidth >= 992 ? 2 : 1);
+      const getMaxIndex = () => Math.max(0, totalSlides - getVisibleCount());
+
+      const updateSlider = (animate = true) => {
+        const visible = getVisibleCount();
+        const maxIndex = totalSlides - visible;
+        if (currentIndex > maxIndex) currentIndex = 0;
+        if (currentIndex < 0) currentIndex = maxIndex;
+
+        const firstSlide = slides[0];
+        if (!firstSlide) return;
+
+        const slideWidth = firstSlide.getBoundingClientRect().width;
+        const gap = 24;
+        const offset = currentIndex * (slideWidth + gap);
+
+        testimonialTrack.style.transition = animate ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)" : "none";
+        testimonialTrack.style.transform = `translateX(-${offset}px)`;
+
+        dots.forEach((dot, idx) => {
+          if (idx === currentIndex) {
+            dot.classList.add("active");
+          } else {
+            dot.classList.remove("active");
+          }
+        });
+      };
+
+      const goNext = () => {
+        const maxIndex = getMaxIndex();
+        currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+        updateSlider();
+      };
+
+      const goPrev = () => {
+        const maxIndex = getMaxIndex();
+        currentIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
+        updateSlider();
+      };
+
+      prevBtns.forEach((btn) => {
+        if (!(btn as any)._bound) {
+          (btn as any)._bound = true;
+          btn.addEventListener("click", goPrev);
+        }
+      });
+
+      nextBtns.forEach((btn) => {
+        if (!(btn as any)._bound) {
+          (btn as any)._bound = true;
+          btn.addEventListener("click", goNext);
+        }
+      });
+
+      dots.forEach((dot, idx) => {
+        if (!(dot as any)._bound) {
+          (dot as any)._bound = true;
+          dot.addEventListener("click", () => {
+            currentIndex = idx;
+            updateSlider();
+          });
+        }
+      });
+
+      const handleResize = () => updateSlider(false);
+      window.addEventListener("resize", handleResize);
+
+      // Auto rotation every 7 seconds, pauses on hover
+      const autoInterval = setInterval(goNext, 7000);
+      sliderTimers.push(autoInterval);
+
+      const wrapper = testimonialTrack.closest(".testimonial-slider-wrapper") as HTMLElement | null;
+      if (wrapper) {
+        wrapper.addEventListener("mouseenter", () => clearInterval(autoInterval));
+      }
+    }
+
     return () => {
       if (chartInstance) {
         chartInstance.destroy();

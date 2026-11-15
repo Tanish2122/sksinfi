@@ -2669,6 +2669,86 @@ html {
   }
 }
 
+/* 10. Testimonials Slider with Arrow Navigation */
+.testimonial-arrow-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #094b57;
+  color: #094b57;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(9, 75, 87, 0.08);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+}
+.testimonial-arrow-btn:hover {
+  background: #094b57;
+  color: #ffffff;
+  transform: scale(1.06);
+  box-shadow: 0 6px 16px rgba(9, 75, 87, 0.25);
+}
+.testimonial-arrow-btn:active {
+  transform: scale(0.96);
+}
+.testimonial-arrow-float {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.testimonial-arrow-float:hover {
+  transform: translateY(-50%) scale(1.06);
+}
+.testimonial-arrow-float:active {
+  transform: translateY(-50%) scale(0.96);
+}
+.float-prev {
+  left: 8px;
+}
+.float-next {
+  right: 8px;
+}
+.testimonial-slider-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.testimonial-track {
+  display: flex;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+.testimonial-slide-item {
+  flex: 0 0 100%;
+  min-width: 100%;
+}
+@media (min-width: 992px) {
+  .testimonial-slide-item {
+    flex: 0 0 calc(50% - 12px);
+    min-width: calc(50% - 12px);
+  }
+}
+.testimonial-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+.testimonial-dot.active {
+  width: 28px;
+  background: #094b57;
+}
+
+
 
 
 
