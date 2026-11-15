@@ -882,13 +882,11 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
     const testimonialTrack = document.getElementById("testimonialTrack") as HTMLElement | null;
     const prevBtns = [
       document.getElementById("testimonialPrevBtn"),
-      document.getElementById("testimonialPrevFloat"),
-      document.getElementById("testimonialPrevBtnBottom"),
+      document.getElementById("testimonialPrevBtnMobile"),
     ].filter(Boolean) as HTMLElement[];
     const nextBtns = [
       document.getElementById("testimonialNextBtn"),
-      document.getElementById("testimonialNextFloat"),
-      document.getElementById("testimonialNextBtnBottom"),
+      document.getElementById("testimonialNextBtnMobile"),
     ].filter(Boolean) as HTMLElement[];
     const dots = Array.from(document.querySelectorAll(".testimonial-dot")) as HTMLElement[];
 
