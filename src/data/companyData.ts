@@ -71,12 +71,12 @@ export const companyInfo = {
     },
     {
       id: "4",
-      name: "Jitendra Jain & Ayush Jain",
+      name: "Jitendra Jain",
       location: "Jaipur, Rajasthan",
-      role: "Business Entrepreneurs",
+      role: "Business Owner • Client of CA Arjun Jain for 8 years",
       rating: 5,
-      comment: "CA Piyush Jain regularly advised us to take comprehensive coverage. After an accident where a non-cashless hospital led to huge out-of-pocket expenses and a ₹1.72 Lakh deduction from Care Health, we immediately connected with SKS INFI and ported to HDFC ERGO with proper cashless coverage. A knowledgeable financial advisor makes all the difference.",
-      service: "HDFC ERGO Cashless Health Cover"
+      comment: "CA Arjun Jain advised comprehensive coverage for 8 years. After a friend's accident at a non-cashless hospital led to a ₹1.72 Lakh deduction, I connected with SKS INFI and shifted to HDFC ERGO for proper cashless cover. Really the best health insurance & financial advisor in India.",
+      service: "Health Insurance • Cashless Cover"
     }
   ],
   faqs: [
