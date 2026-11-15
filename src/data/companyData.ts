@@ -73,7 +73,7 @@ export const companyInfo = {
       id: "4",
       name: "Jitendra Jain",
       location: "Jaipur, Rajasthan",
-      role: "Business Owner • Client of CA Aarun Jain for 8 years",
+      role: "Verified Client",
       rating: 5,
       comment: "CA Aarun Jain advised comprehensive coverage for 8 years. After a friend's accident at a non-cashless hospital led to a ₹1.72 Lakh deduction, I connected with SKS INFI and shifted to HDFC ERGO for proper cashless cover. Really the best health insurance & financial advisor in India.",
       service: "Health Insurance • Cashless Cover"
