@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EnquiryModal from "@/components/EnquiryModal";
+import SIPCalculator from "@/components/SIPCalculator";
 import { submitLoanEnquiry, submitPartnerEnquiry, submitContactEnquiry } from "@/lib/supabase";
 
 interface LegacyPageRendererProps {
@@ -590,7 +591,8 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
         return;
       }
 
-      const i = r / (12 * 100);
+      // Groww-standard compounding formula: periodic effective monthly rate i = (1 + r/100)^(1/12) - 1
+      const i = Math.pow(1 + r / 100, 1 / 12) - 1;
       const n = t * 12;
       let futureValue = 0;
       if (i > 0) {
@@ -997,11 +999,23 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
             setModalOpen(true);
           }}
         />
-        <main
-          className="flex-1 w-full"
-          dangerouslySetInnerHTML={{ __html: cleanHtml }}
-          suppressHydrationWarning
-        />
+        {slug === "calculate_sip" || slug === "calculate_sip.php" ? (
+          <main className="flex-1 max-w-[1240px] mx-auto px-4 sm:px-6 py-12 w-full">
+            <SIPCalculator
+              onStartSIP={() => {
+                setModalCategory("Investments");
+                setModalProduct("Mutual Funds & SIP");
+                setModalOpen(true);
+              }}
+            />
+          </main>
+        ) : (
+          <main
+            className="flex-1 w-full"
+            dangerouslySetInnerHTML={{ __html: cleanHtml }}
+            suppressHydrationWarning
+          />
+        )}
         <Footer />
       </div>
       {modalOpen ? (
