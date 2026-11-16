@@ -87,7 +87,7 @@ export const companyInfo = {
       comment: "रात 10:00 बजे WhatsApp वीडियो कॉल पर SKS INFI के प्रतिनिधि के गहन विश्लेषण व प्रेजेंटेशन से प्रभावित होकर मैंने TATA AIA की ₹3 करोड़ की गारंटीड टर्म पॉलिसी ली, जो 65 वर्ष बाद मनी बैक लाभ के साथ रिटायरमेंट भी सुरक्षित करती है। SKS INFI की रिसर्च व प्रेजेंटेशन वास्तव में लाजवाब है!",
       service: "Term Insurance • TATA AIA ₹3 Cr"
     },
-    {
+        {
       id: "6",
       name: "CA Umang Jain",
       location: "India",
@@ -95,6 +95,24 @@ export const companyInfo = {
       rating: 5,
       comment: "Managing our ₹1.00+ Cr mutual fund and SIP portfolio previously yielded only 8%-9% returns. Under SKS INFI's research and diversification across sectors, large-cap, mid-cap, and small-cap funds, my portfolio has achieved a CAGR of over 15% over the last 3 years. Truly one of the most professional financial advisors in India.",
       service: "Mutual Funds & SIP Planning"
+    },
+    {
+      id: "7",
+      name: "Saurabh Gakkhar",
+      location: "Jaipur, Rajasthan",
+      role: "EZEE property, Jaipur | Loan DSA Partner",
+      rating: 5,
+      comment: "Hassle free service to my clients, Payment of our commission without follow-up. Best Loan DSA in India.",
+      service: "Loan DSA & Partner Payouts"
+    },
+    {
+      id: "8",
+      name: "BL Singhania",
+      location: "Jaipur, Rajasthan",
+      role: "SINGHANIA PROPERTIES | Channel Partner (Loans > ₹85 Cr)",
+      rating: 5,
+      comment: "I have been associated with SKS INFI for last 7 years and facilitate loan to Indian Residents & NRIs through him for more than ₹ 85 Crore ( Approx). Best Loan consulting firm in India for both Indian residents & NRIs.",
+      service: "Resident & NRI Loan Advisory"
     }
   ],
   faqs: [
