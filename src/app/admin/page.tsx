@@ -26,29 +26,17 @@ const DEFAULT_BLOG_FORM: BlogFormState = {
   title: "",
   slug: "",
   excerpt: "",
-  category: "Loans",
+  category: "",
   authorName: "Arun Mehta",
   authorRole: "Senior Financial Consultant, SKS INFI",
   authorAvatar: "/images/user (1).png",
   publishedDate: "",
   readTime: "5 min read",
   coverImage: "/images/homeloan.avif",
-  tags: "Loan, Finance, Jaipur, SKS INFI",
+  tags: "Finance, Advisory, SKS INFI",
   featured: false,
-  takeaways:
-    "Securing optimal interest spreads can reduce total outflow significantly.\nStructured documentation ensures fastest approval turnaround.\nAlways evaluate total processing fees and pre-closure terms.",
-  content: `<h2>Executive Overview</h2>
-<p>Write your detailed article introduction and strategic analysis here. Jaipur's growing financial market provides ample opportunities for informed borrowers and investors.</p>
-
-<h2>Key Criteria & Regulatory Framework</h2>
-<p>Lenders and financial institutions assess applicants based on risk mitigation, disposable surplus, and verifiable credit history.</p>
-<ul>
-  <li><strong>Credit Eligibility:</strong> High CIBIL standing unlocks prime tier interest brackets.</li>
-  <li><strong>Income Documentation:</strong> Audited statements or salary certificates ensure swift underwriting.</li>
-</ul>
-
-<h2>Strategic Recommendations from SKS INFI</h2>
-<p>Consult with our certified advisors before finalizing your financial strategy to unlock bespoke rate waivers and institutional benefits.</p>`
+  takeaways: "",
+  content: ""
 };
 
 const PRESET_COVERS = [
@@ -86,6 +74,32 @@ export default function AdminPage() {
   const [blogForm, setBlogForm] = useState<BlogFormState>(DEFAULT_BLOG_FORM);
   const [blogSaving, setBlogSaving] = useState(false);
   const [blogModalTab, setBlogModalTab] = useState<"edit" | "preview">("edit");
+  const [editorMode, setEditorMode] = useState<"rich" | "html">("rich");
+  const editorRef = React.useRef<HTMLDivElement>(null);
+
+  // Sync contentEditable when modal opens or editingBlog changes
+  useEffect(() => {
+    if (showBlogModal && editorRef.current) {
+      if (editorRef.current.innerHTML !== blogForm.content) {
+        editorRef.current.innerHTML = blogForm.content;
+      }
+    }
+  }, [showBlogModal, editingBlog]);
+
+  const executeEditorCommand = (command: string, value: string | undefined = undefined) => {
+    if (typeof document !== "undefined") {
+      if (editorRef.current && document.activeElement !== editorRef.current) {
+        editorRef.current.focus();
+      }
+      document.execCommand(command, false, value);
+      if (editorRef.current) {
+        setBlogForm((prev) => ({
+          ...prev,
+          content: editorRef.current?.innerHTML || ""
+        }));
+      }
+    }
+  };
   const [notification, setNotification] = useState<{
     type: "success" | "error";
     message: string;
@@ -850,6 +864,7 @@ export default function AdminPage() {
                       <span>Restore Defaults</span>
                     </button>
                     <button
+                      id="btn-add-new-article"
                       type="button"
                       onClick={handleOpenCreateBlog}
                       style={{ backgroundColor: "#b69455" }}
@@ -1311,7 +1326,7 @@ export default function AdminPage() {
           style={{
             position: "fixed",
             inset: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.75)",
+            backgroundColor: "rgba(15, 23, 42, 0.65)",
             zIndex: 99999,
             display: "flex",
             alignItems: "center",
@@ -1324,149 +1339,77 @@ export default function AdminPage() {
             style={{
               backgroundColor: "#ffffff",
               borderRadius: "16px",
-              maxWidth: "960px",
+              maxWidth: "880px",
               width: "100%",
               maxHeight: "92vh",
               display: "flex",
               flexDirection: "column",
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
+              boxShadow: "0 20px 40px -15px rgba(0, 0, 0, 0.15)",
               overflow: "hidden",
-              border: "1px solid #e2e8f0"
+              border: "1px solid #edf2f7",
+              fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
             }}
           >
-            {/* Modal Header */}
+            {/* Modal Header (Clean White Header matching reference) */}
             <div
               style={{
-                backgroundColor: "#0f172a",
-                color: "#ffffff",
-                padding: "18px 24px",
+                backgroundColor: "#ffffff",
+                padding: "20px 28px 16px 28px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                flexShrink: 0,
-                borderBottom: "1px solid #1e293b"
+                borderBottom: "1px solid #f1f5f9",
+                flexShrink: 0
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "10px",
-                    backgroundColor: "#b69455",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#ffffff",
-                    fontSize: "16px",
-                    flexShrink: 0
-                  }}
-                >
-                  <i className={`fa ${editingBlog ? "fa-pen-to-square" : "fa-plus"}`}></i>
-                </div>
-                <div>
-                  <h3 style={{ fontSize: "17px", fontWeight: "700", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
-                    {editingBlog ? "Edit Blog Article" : "Create New Blog Article"}
-                  </h3>
-                  <p style={{ fontSize: "12px", color: "#94a3b8", margin: "3px 0 0 0", lineHeight: 1.2 }}>
-                    {editingBlog
-                      ? `Updating: ${editingBlog.title}`
-                      : "Fill in the details to publish a new financial advisory article"}
-                  </p>
-                </div>
-              </div>
+              <h2
+                style={{
+                  fontSize: "17px",
+                  fontWeight: "800",
+                  letterSpacing: "0.02em",
+                  color: "#1e293b",
+                  textTransform: "uppercase",
+                  margin: 0,
+                  fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                }}
+              >
+                {editingBlog ? "EDIT ARTICLE" : "CREATE NEW ARTICLE"}
+              </h2>
 
-              {/* Mode Toggle (Edit vs Preview) */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div
-                  style={{
-                    backgroundColor: "#1e293b",
-                    padding: "3px",
-                    borderRadius: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px"
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setBlogModalTab("edit")}
-                    style={{
-                      backgroundColor: blogModalTab === "edit" ? "#b69455" : "transparent",
-                      color: blogModalTab === "edit" ? "#ffffff" : "#94a3b8",
-                      fontWeight: 600,
-                      fontSize: "12px",
-                      padding: "6px 14px",
-                      borderRadius: "6px",
-                      border: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      transition: "all 0.15s ease"
-                    }}
-                  >
-                    <i className="fa fa-code"></i> Editor
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setBlogModalTab("preview")}
-                    style={{
-                      backgroundColor: blogModalTab === "preview" ? "#b69455" : "transparent",
-                      color: blogModalTab === "preview" ? "#ffffff" : "#94a3b8",
-                      fontWeight: 600,
-                      fontSize: "12px",
-                      padding: "6px 14px",
-                      borderRadius: "6px",
-                      border: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      transition: "all 0.15s ease"
-                    }}
-                  >
-                    <i className="fa fa-eye"></i> Live Preview
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowBlogModal(false)}
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "8px",
-                    backgroundColor: "#1e293b",
-                    color: "#94a3b8",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "14px",
-                    transition: "all 0.15s ease"
-                  }}
-                  title="Close modal"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowBlogModal(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#94a3b8",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  padding: "4px 8px",
+                  lineHeight: 1,
+                  transition: "color 0.15s ease"
+                }}
+                onMouseOver={(e) => ((e.currentTarget as HTMLElement).style.color = "#475569")}
+                onMouseOut={(e) => ((e.currentTarget as HTMLElement).style.color = "#94a3b8")}
+                title="Close"
+              >
+                ✕
+              </button>
             </div>
 
             {/* Modal Body */}
-            <div style={{ padding: "24px", overflowY: "auto", flex: 1, backgroundColor: "#f8fafc" }}>
+            <div style={{ padding: "24px 28px", overflowY: "auto", flex: 1, backgroundColor: "#ffffff" }}>
               {blogModalTab === "edit" ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                  {/* Title & Slug */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  {/* Row 1: ARTICLE TITLE & CATEGORY */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Article Title <span style={{ color: "#ef4444" }}>*</span>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        ARTICLE TITLE
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. Complete Guide to Business Loan Subsidies in Jaipur (2025)"
+                        placeholder="Enter catchy title..."
                         value={blogForm.title}
                         onChange={(e) => {
                           const newTitle = e.target.value;
@@ -1484,514 +1427,495 @@ export default function AdminPage() {
                         }}
                         style={{
                           width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13.5px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
+                          backgroundColor: "#f4f6f8",
+                          border: "1px solid #edf2f7",
+                          borderRadius: "12px",
+                          padding: "13px 16px",
+                          fontSize: "14px",
+                          color: "#1e293b",
+                          outline: "none",
+                          transition: "all 0.15s ease"
                         }}
                         required
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        URL Slug <span style={{ color: "#ef4444" }}>*</span>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        CATEGORY
                       </label>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <span
+                      <input
+                        type="text"
+                        list="cat-suggestions"
+                        placeholder="e.g. Health Tips"
+                        value={blogForm.category}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, category: e.target.value }))}
+                        style={{
+                          width: "100%",
+                          backgroundColor: "#f4f6f8",
+                          border: "1px solid #edf2f7",
+                          borderRadius: "12px",
+                          padding: "13px 16px",
+                          fontSize: "14px",
+                          color: "#1e293b",
+                          outline: "none",
+                          transition: "all 0.15s ease"
+                        }}
+                      />
+                      <datalist id="cat-suggestions">
+                        <option value="Loans" />
+                        <option value="Investments" />
+                        <option value="NRI Advisory" />
+                        <option value="Business Loans" />
+                        <option value="Insurance" />
+                        <option value="Taxation" />
+                      </datalist>
+                    </div>
+                  </div>
+
+                  {/* Row 2: EXCERPT (SHORT SUMMARY) */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                      EXCERPT (SHORT SUMMARY)
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="A brief summary for the blog list..."
+                      value={blogForm.excerpt}
+                      onChange={(e) => setBlogForm((prev) => ({ ...prev, excerpt: e.target.value }))}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "#f4f6f8",
+                        border: "1px solid #edf2f7",
+                        borderRadius: "12px",
+                        padding: "12px 16px",
+                        fontSize: "14px",
+                        color: "#1e293b",
+                        outline: "none",
+                        lineHeight: "1.5",
+                        minHeight: "56px",
+                        resize: "vertical"
+                      }}
+                    />
+                  </div>
+
+                  {/* Row 3: CONTENT (RICH TEXT) */}
+                  <div>
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                      CONTENT (RICH TEXT)
+                    </label>
+
+                    {/* Rich Editor Outer Card (Matching User Screenshot) */}
+                    <div
+                      style={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "14px",
+                        overflow: "hidden",
+                        backgroundColor: "#ffffff"
+                      }}
+                    >
+                      {/* Primary Toolbar */}
+                      <div
+                        style={{
+                          backgroundColor: "#ffffff",
+                          borderBottom: "1px solid #f1f5f9",
+                          padding: "8px 12px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          flexWrap: "wrap"
+                        }}
+                      >
+                        {/* Undo */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('undo')}
+                          title="Undo (Ctrl+Z)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                        </button>
+
+                        {/* Redo */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('redo')}
+                          title="Redo (Ctrl+Y)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+
+                        {/* Bold */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('bold')}
+                          title="Bold (Ctrl+B)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "800", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                        >
+                          B
+                        </button>
+
+                        {/* Italic */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('italic')}
+                          title="Italic (Ctrl+I)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontStyle: "italic", fontFamily: "serif", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                        >
+                          I
+                        </button>
+
+                        {/* Underline */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('underline')}
+                          title="Underline (Ctrl+U)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", textDecoration: "underline", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                        >
+                          U
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+
+                        {/* H1 */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('formatBlock', '<h1>')}
+                          title="Heading 1"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                        >
+                          H<sub style={{ fontSize: "9px" }}>1</sub>
+                        </button>
+
+                        {/* H2 */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('formatBlock', '<h2>')}
+                          title="Heading 2"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                        >
+                          H<sub style={{ fontSize: "9px" }}>2</sub>
+                        </button>
+
+                        {/* H3 */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('formatBlock', '<h3>')}
+                          title="Heading 3"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                        >
+                          H<sub style={{ fontSize: "9px" }}>3</sub>
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+
+                        {/* Align Left */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('justifyLeft')}
+                          title="Align Left"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+                        </button>
+
+                        {/* Align Center */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('justifyCenter')}
+                          title="Align Center"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>
+                        </button>
+
+                        {/* Align Right */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('justifyRight')}
+                          title="Align Right"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+                        </button>
+
+                        {/* Justify */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('justifyFull')}
+                          title="Justify"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+
+                        {/* Bullet List */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('insertUnorderedList')}
+                          title="Bullet List"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        </button>
+
+                        {/* Numbered List */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('insertOrderedList')}
+                          title="Numbered List"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+
+                        {/* Link */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const u = prompt("Enter link URL (e.g. https://www.sksinfi.com):");
+                            if (u) executeEditorCommand('createLink', u);
+                          }}
+                          title="Insert Link"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </button>
+                      </div>
+
+                      {/* Sub-toolbar row with highlighter pen matching screenshot */}
+                      <div
+                        style={{
+                          backgroundColor: "#ffffff",
+                          borderBottom: "1px solid #f1f5f9",
+                          padding: "4px 14px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span style={{ color: "#e2e8f0" }}>|</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const c = prompt("Enter text color (e.g. #094b57, #b69455, red):", "#b69455");
+                              if (c) executeEditorCommand('foreColor', c);
+                            }}
+                            title="Text Color / Pen"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#f59e0b",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              display: "flex",
+                              alignItems: "center",
+                              padding: "2px 4px"
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setEditorMode(editorMode === "rich" ? "html" : "rich")}
                           style={{
-                            backgroundColor: "#f1f5f9",
-                            border: "1.5px solid #cbd5e1",
-                            borderRight: "none",
-                            borderRadius: "8px 0 0 8px",
-                            padding: "9px 12px",
-                            fontSize: "12px",
+                            background: "none",
+                            border: "none",
+                            fontSize: "11px",
+                            fontWeight: "600",
                             color: "#64748b",
-                            fontFamily: "monospace",
-                            userSelect: "none"
+                            cursor: "pointer",
+                            padding: "2px 6px"
                           }}
                         >
+                          {editorMode === "rich" ? "</> View HTML" : "Visual Mode"}
+                        </button>
+                      </div>
+
+                      {/* Editable Content Area */}
+                      {editorMode === "rich" ? (
+                        <div
+                          ref={editorRef}
+                          contentEditable={true}
+                          suppressContentEditableWarning={true}
+                          onInput={(e) => {
+                            setBlogForm((prev) => ({
+                              ...prev,
+                              content: e.currentTarget.innerHTML
+                            }));
+                          }}
+                          style={{
+                            minHeight: "260px",
+                            maxHeight: "380px",
+                            overflowY: "auto",
+                            padding: "18px 20px",
+                            fontSize: "14.5px",
+                            lineHeight: "1.7",
+                            color: "#1e293b",
+                            outline: "none"
+                          }}
+                        />
+                      ) : (
+                        <textarea
+                          rows={12}
+                          value={blogForm.content}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, content: e.target.value }))}
+                          style={{
+                            width: "100%",
+                            minHeight: "260px",
+                            padding: "16px 20px",
+                            fontSize: "13px",
+                            fontFamily: "monospace",
+                            lineHeight: "1.6",
+                            color: "#1e293b",
+                            border: "none",
+                            outline: "none",
+                            backgroundColor: "#fafbfc"
+                          }}
+                        />
+                      )}
+
+                      {/* Status Bar (Matching Screenshot) */}
+                      <div
+                        style={{
+                          backgroundColor: "#f4f6f8",
+                          borderTop: "1px solid #f1f5f9",
+                          padding: "8px 14px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          fontSize: "11px",
+                          color: "#94a3b8"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: "700", letterSpacing: "0.05em" }}>
+                          <span>T</span>
+                          <span>RICH EDITOR ACTIVE</span>
+                        </div>
+                        <div>Note: Justification support is enabled for paragraphs and lists.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Metadata Section: URL Slug & Cover Image */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", paddingTop: "10px", borderTop: "1px solid #f1f5f9" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        URL SLUG
+                      </label>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <span style={{ backgroundColor: "#f1f5f9", border: "1px solid #edf2f7", borderRight: "none", borderRadius: "12px 0 0 12px", padding: "12px 14px", fontSize: "13px", color: "#64748b", fontFamily: "monospace", userSelect: "none" }}>
                           /blogs/
                         </span>
                         <input
                           type="text"
-                          placeholder="business-loan-subsidies-jaipur-guide"
+                          placeholder="auto-generated-slug"
                           value={blogForm.slug}
-                          onChange={(e) =>
-                            setBlogForm((prev) => ({
-                              ...prev,
-                              slug: e.target.value
-                                .toLowerCase()
-                                .replace(/[^a-z0-9-]+/g, "-")
-                            }))
-                          }
-                          style={{
-                            width: "100%",
-                            border: "1.5px solid #cbd5e1",
-                            borderRadius: "0 8px 8px 0",
-                            padding: "9px 12px",
-                            fontSize: "12px",
-                            fontFamily: "monospace",
-                            color: "#0f172a",
-                            backgroundColor: "#ffffff",
-                            outline: "none"
-                          }}
-                          required
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-") }))}
+                          style={{ width: "100%", backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "0 12px 12px 0", padding: "12px 16px", fontSize: "13px", fontFamily: "monospace", color: "#1e293b", outline: "none" }}
                         />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Category, Read Time, Published Date */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Category
-                      </label>
-                      <select
-                        value={blogForm.category}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, category: e.target.value }))
-                        }
-                        style={{
-                          width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      >
-                        <option value="Loans">Loans</option>
-                        <option value="Investments">Investments</option>
-                        <option value="NRI Advisory">NRI Advisory</option>
-                        <option value="Business Loans">Business Loans</option>
-                        <option value="Insurance">Insurance</option>
-                        <option value="Taxation">Taxation</option>
-                      </select>
-                    </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Estimated Read Time
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        COVER IMAGE URL
                       </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 6 min read"
-                        value={blogForm.readTime}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, readTime: e.target.value }))
-                        }
-                        style={{
-                          width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Published Date
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. October 24, 2025"
-                        value={blogForm.publishedDate}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, publishedDate: e.target.value }))
-                        }
-                        style={{
-                          width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Author details */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Author Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Arun Mehta"
-                        value={blogForm.authorName}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, authorName: e.target.value }))
-                        }
-                        style={{
-                          width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                        Author Title / Role
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Senior Financial Consultant, SKS INFI"
-                        value={blogForm.authorRole}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, authorRole: e.target.value }))
-                        }
-                        style={{
-                          width: "100%",
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "13px",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Cover Image & Presets */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                      Cover Image URL or Path
-                    </label>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <input
-                        type="text"
-                        placeholder="/images/homeloan.avif or https://..."
-                        value={blogForm.coverImage}
-                        onChange={(e) =>
-                          setBlogForm((prev) => ({ ...prev, coverImage: e.target.value }))
-                        }
-                        style={{
-                          flex: 1,
-                          border: "1.5px solid #cbd5e1",
-                          borderRadius: "8px",
-                          padding: "9px 12px",
-                          fontSize: "12px",
-                          fontFamily: "monospace",
-                          color: "#0f172a",
-                          backgroundColor: "#ffffff",
-                          outline: "none"
-                        }}
-                      />
-                      {blogForm.coverImage && (
-                        <img
-                          src={blogForm.coverImage}
-                          alt="Cover Preview"
-                          style={{
-                            width: "48px",
-                            height: "38px",
-                            objectFit: "cover",
-                            borderRadius: "6px",
-                            border: "1px solid #cbd5e1",
-                            flexShrink: 0
-                          }}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/images/homeloan.avif";
-                          }}
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                        <input
+                          type="text"
+                          placeholder="/images/homeloan.avif"
+                          value={blogForm.coverImage}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, coverImage: e.target.value }))}
+                          style={{ flex: 1, backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 16px", fontSize: "13px", color: "#1e293b", outline: "none" }}
                         />
-                      )}
-                    </div>
-
-                    {/* Presets */}
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", marginTop: "8px" }}>
-                      <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#64748b" }}>Quick Presets:</span>
-                      {PRESET_COVERS.map((preset) => {
-                        const isSelected = blogForm.coverImage === preset.url;
-                        return (
+                        {blogForm.coverImage && (
+                          <img
+                            src={blogForm.coverImage}
+                            alt="Cover"
+                            style={{ width: "42px", height: "42px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = "/images/homeloan.avif"; }}
+                          />
+                        )}
+                      </div>
+                      {/* Presets */}
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", marginTop: "8px" }}>
+                        <span style={{ fontSize: "11px", color: "#94a3b8" }}>Presets:</span>
+                        {PRESET_COVERS.map((preset) => (
                           <button
                             key={preset.url}
                             type="button"
-                            onClick={() =>
-                              setBlogForm((prev) => ({ ...prev, coverImage: preset.url }))
-                            }
+                            onClick={() => setBlogForm((prev) => ({ ...prev, coverImage: preset.url }))}
                             style={{
-                              backgroundColor: isSelected ? "#094b57" : "#e2e8f0",
-                              color: isSelected ? "#ffffff" : "#334155",
-                              border: isSelected ? "1px solid #094b57" : "1px solid #cbd5e1",
-                              padding: "4px 10px",
+                              backgroundColor: blogForm.coverImage === preset.url ? "#094b57" : "#f1f5f9",
+                              color: blogForm.coverImage === preset.url ? "#ffffff" : "#475569",
+                              border: "none",
+                              padding: "3px 8px",
                               borderRadius: "6px",
                               fontSize: "11px",
                               fontWeight: "600",
-                              cursor: "pointer",
-                              transition: "all 0.15s ease"
+                              cursor: "pointer"
                             }}
                           >
                             {preset.label}
                           </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Featured Checkbox */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      backgroundColor: "#ffffff",
-                      border: "1.5px solid #e2e8f0",
-                      borderRadius: "10px",
-                      padding: "10px 14px",
-                      margin: "4px 0"
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      id="featured-checkbox"
-                      checked={blogForm.featured}
-                      onChange={(e) =>
-                        setBlogForm((prev) => ({ ...prev, featured: e.target.checked }))
-                      }
-                      style={{
-                        width: "18px",
-                        height: "18px",
-                        margin: 0,
-                        cursor: "pointer",
-                        accentColor: "#b69455",
-                        flexShrink: 0
-                      }}
-                    />
-                    <label
-                      htmlFor="featured-checkbox"
-                      style={{
-                        fontSize: "12.5px",
-                        fontWeight: "600",
-                        color: "#1e293b",
-                        cursor: "pointer",
-                        margin: 0,
-                        userSelect: "none"
-                      }}
-                    >
-                      ⭐ Mark as Featured Article (Prominently pinned at the top of the blog page)
-                    </label>
-                  </div>
-
-                  {/* Excerpt */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                      Short Excerpt & SEO Meta Description
-                    </label>
-                    <textarea
-                      rows={2}
-                      placeholder="Brief 1-2 sentence overview shown on blog cards and Google search results (150-200 chars)..."
-                      value={blogForm.excerpt}
-                      onChange={(e) =>
-                        setBlogForm((prev) => ({ ...prev, excerpt: e.target.value }))
-                      }
-                      style={{
-                        width: "100%",
-                        border: "1.5px solid #cbd5e1",
-                        borderRadius: "8px",
-                        padding: "10px 12px",
-                        fontSize: "13px",
-                        color: "#0f172a",
-                        backgroundColor: "#ffffff",
-                        outline: "none",
-                        lineHeight: 1.5
-                      }}
-                    />
-                  </div>
-
-                  {/* Key Takeaways */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                      Key Takeaways & Highlights (One per line)
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Enter 3-4 bullet takeaways, one per line..."
-                      value={blogForm.takeaways}
-                      onChange={(e) =>
-                        setBlogForm((prev) => ({ ...prev, takeaways: e.target.value }))
-                      }
-                      style={{
-                        width: "100%",
-                        border: "1.5px solid #cbd5e1",
-                        borderRadius: "8px",
-                        padding: "10px 12px",
-                        fontSize: "12.5px",
-                        fontFamily: "monospace",
-                        color: "#0f172a",
-                        backgroundColor: "#ffffff",
-                        outline: "none",
-                        lineHeight: 1.5
-                      }}
-                    />
-                  </div>
-
-                  {/* Tags */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
-                      Tags / Keywords (Comma-separated)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Home Loan, Jaipur, Interest Rates, CIBIL, Subsidy"
-                      value={blogForm.tags}
-                      onChange={(e) =>
-                        setBlogForm((prev) => ({ ...prev, tags: e.target.value }))
-                      }
-                      style={{
-                        width: "100%",
-                        border: "1.5px solid #cbd5e1",
-                        borderRadius: "8px",
-                        padding: "9px 12px",
-                        fontSize: "13px",
-                        color: "#0f172a",
-                        backgroundColor: "#ffffff",
-                        outline: "none"
-                      }}
-                    />
-                  </div>
-
-                  {/* Rich Content Editor */}
-                  <div>
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "6px" }}>
-                      <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", margin: 0 }}>
-                        Article Content (HTML / Rich Text) <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-
-                      {/* Quick formatting toolbar */}
-                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px" }}>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            insertContentSnippet(
-                              "<h2>Section Subtitle Here</h2>\n<p>Explain the detailed regulatory or advisory concept here...</p>"
-                            )
-                          }
-                          style={{
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #cbd5e1",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            color: "#334155",
-                            cursor: "pointer"
-                          }}
-                        >
-                          + H2 Heading
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            insertContentSnippet(
-                              "<h3>Sub-topic Detail</h3>\n<p>Elaborate specific points...</p>"
-                            )
-                          }
-                          style={{
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #cbd5e1",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            color: "#334155",
-                            cursor: "pointer"
-                          }}
-                        >
-                          + H3
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            insertContentSnippet(
-                              "<ul>\n  <li><strong>Point 1:</strong> Benefit explanation</li>\n  <li><strong>Point 2:</strong> Documentation prerequisite</li>\n</ul>"
-                            )
-                          }
-                          style={{
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #cbd5e1",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            color: "#334155",
-                            cursor: "pointer"
-                          }}
-                        >
-                          + Bullet List
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            insertContentSnippet(
-                              '<div style="background:#f1f7f8;border-left:4px solid #094b57;padding:16px;border-radius:8px;margin:20px 0;">\n  <strong>Expert Recommendation:</strong> Consult SKS INFI advisors to verify your eligibility before formal credit submission.\n</div>'
-                            )
-                          }
-                          style={{
-                            backgroundColor: "#f1f7f8",
-                            border: "1px solid #99f6e4",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "700",
-                            color: "#094b57",
-                            cursor: "pointer"
-                          }}
-                        >
-                          + Callout Box
-                        </button>
+                        ))}
                       </div>
                     </div>
+                  </div>
 
-                    <textarea
-                      rows={12}
-                      placeholder="Write your article HTML content here..."
-                      value={blogForm.content}
-                      onChange={(e) =>
-                        setBlogForm((prev) => ({ ...prev, content: e.target.value }))
-                      }
-                      style={{
-                        width: "100%",
-                        border: "1.5px solid #cbd5e1",
-                        borderRadius: "8px",
-                        padding: "12px",
-                        fontSize: "13px",
-                        fontFamily: "monospace",
-                        lineHeight: 1.6,
-                        color: "#0f172a",
-                        backgroundColor: "#ffffff",
-                        outline: "none"
-                      }}
-                      required
-                    />
+                  {/* Author & Settings Row */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        AUTHOR NAME
+                      </label>
+                      <input
+                        type="text"
+                        value={blogForm.authorName}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, authorName: e.target.value }))}
+                        style={{ width: "100%", backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 14px", fontSize: "13px", color: "#1e293b", outline: "none" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
+                        READ TIME
+                      </label>
+                      <input
+                        type="text"
+                        value={blogForm.readTime}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, readTime: e.target.value }))}
+                        style={{ width: "100%", backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 14px", fontSize: "13px", color: "#1e293b", outline: "none" }}
+                      />
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", paddingTop: "26px" }}>
+                      <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600", color: "#334155" }}>
+                        <input
+                          type="checkbox"
+                          checked={blogForm.featured}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, featured: e.target.checked }))}
+                          style={{ width: "18px", height: "18px", accentColor: "#b69455", cursor: "pointer" }}
+                        />
+                        <span>⭐ Mark as Featured</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               ) : (
                 /* LIVE ARTICLE PREVIEW TAB */
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "12px", padding: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Category & Date */}
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px" }}>
                     <span
                       style={{
@@ -2012,20 +1936,17 @@ export default function AdminPage() {
                     <span style={{ color: "#64748b" }}>{blogForm.readTime}</span>
                   </div>
 
-                  {/* Title */}
                   <h1 style={{ fontSize: "26px", fontWeight: "700", color: "#094b57", lineHeight: 1.3, margin: 0 }}>
                     {blogForm.title || "Untitled Article"}
                   </h1>
 
-                  {/* Excerpt */}
                   {blogForm.excerpt && (
                     <p style={{ fontSize: "14px", color: "#475569", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>
                       {blogForm.excerpt}
                     </p>
                   )}
 
-                  {/* Author Card */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", width: "fit-content" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", backgroundColor: "#f4f6f8", borderRadius: "8px", border: "1px solid #e2e8f0", width: "fit-content" }}>
                     <img
                       src={blogForm.authorAvatar || "/images/user (1).png"}
                       alt={blogForm.authorName}
@@ -2041,7 +1962,6 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  {/* Cover Image */}
                   {blogForm.coverImage && (
                     <img
                       src={blogForm.coverImage}
@@ -2053,43 +1973,10 @@ export default function AdminPage() {
                     />
                   )}
 
-                  {/* Key Takeaways Box */}
-                  {blogForm.takeaways && (
-                    <div style={{ backgroundColor: "#f0fdf4", borderLeft: "4px solid #16a34a", padding: "16px", borderRadius: "0 10px 10px 0" }}>
-                      <div style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#166534", marginBottom: "8px" }}>
-                        Key Takeaways
-                      </div>
-                      <ul style={{ fontSize: "12.5px", color: "#15803d", margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "6px" }}>
-                        {blogForm.takeaways
-                          .split("\n")
-                          .filter(Boolean)
-                          .map((t, idx) => (
-                            <li key={idx}>{t}</li>
-                          ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Rendered HTML Content */}
                   <div
                     style={{ lineHeight: 1.7, fontSize: "14px", color: "#334155" }}
                     dangerouslySetInnerHTML={{ __html: blogForm.content }}
                   />
-
-                  {/* Tags */}
-                  {blogForm.tags && (
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", paddingTop: "8px" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Tags:</span>
-                      {blogForm.tags.split(",").map((t, i) => (
-                        <span
-                          key={i}
-                          style={{ fontSize: "11px", backgroundColor: "#e2e8f0", color: "#334155", padding: "2px 8px", borderRadius: "4px" }}
-                        >
-                          {t.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -2098,33 +1985,44 @@ export default function AdminPage() {
             <div
               style={{
                 backgroundColor: "#ffffff",
-                borderTop: "1px solid #e2e8f0",
-                padding: "14px 24px",
+                borderTop: "1px solid #f1f5f9",
+                padding: "16px 28px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 flexShrink: 0
               }}
             >
-              <div style={{ fontSize: "12px", color: "#64748b" }}>
-                {blogModalTab === "edit" ? (
-                  <span>Click <strong>'Live Preview'</strong> above to see formatted article layout.</span>
-                ) : (
-                  <span>Reviewing layout preview. Switch back to <strong>'Editor'</strong> to make changes.</span>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setBlogModalTab(blogModalTab === "edit" ? "preview" : "edit")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "12.5px",
+                  fontWeight: "600",
+                  color: "#094b57",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <i className="fa-solid fa-eye text-xs"></i>
+                <span>{blogModalTab === "edit" ? "Preview Formatted Layout" : "Back to Editor"}</span>
+              </button>
 
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <button
                   type="button"
                   onClick={() => setShowBlogModal(false)}
                   style={{
-                    padding: "8px 18px",
-                    border: "1.5px solid #cbd5e1",
-                    borderRadius: "8px",
-                    fontSize: "12.5px",
+                    padding: "10px 20px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "10px",
+                    fontSize: "13px",
                     fontWeight: "600",
-                    color: "#475569",
+                    color: "#64748b",
                     backgroundColor: "#ffffff",
                     cursor: "pointer",
                     transition: "all 0.15s ease"
@@ -2138,19 +2036,19 @@ export default function AdminPage() {
                   onClick={() => handleSaveBlog()}
                   disabled={blogSaving}
                   style={{
-                    padding: "8px 22px",
-                    backgroundColor: "#b69455",
+                    padding: "10px 24px",
+                    backgroundColor: "#094b57",
                     color: "#ffffff",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     border: "none",
-                    fontSize: "12.5px",
+                    fontSize: "13px",
                     fontWeight: "700",
                     cursor: blogSaving ? "not-allowed" : "pointer",
                     opacity: blogSaving ? 0.6 : 1,
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    boxShadow: "0 2px 4px rgba(182, 148, 85, 0.3)",
+                    boxShadow: "0 2px 4px rgba(9, 75, 87, 0.2)",
                     transition: "all 0.15s ease"
                   }}
                 >
