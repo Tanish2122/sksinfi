@@ -298,9 +298,20 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
         .then((res) => (res.ok ? res.json() : null))
         .then((blogs) => {
           if (Array.isArray(blogs) && blogs.length > 0) {
+            let activeBlogs = blogs;
+            if (typeof window !== "undefined") {
+              try {
+                const deletedSlugs: string[] = JSON.parse(
+                  localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+                );
+                activeBlogs = activeBlogs.filter(
+                  (b: any) => !deletedSlugs.includes(b.slug?.toLowerCase()?.trim())
+                );
+              } catch {}
+            }
             const grid = document.getElementById("home-blogs-grid");
             if (grid) {
-              const topBlogs = blogs.slice(0, 3);
+              const topBlogs = activeBlogs.slice(0, 3);
               grid.innerHTML = topBlogs
                 .map(
                   (post: any) => `

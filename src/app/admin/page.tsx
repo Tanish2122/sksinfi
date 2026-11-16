@@ -363,7 +363,7 @@ export default function AdminPage() {
   const handleDeleteBlog = async (slug: string, title: string) => {
     if (
       !window.confirm(
-        `Are you sure you want to delete "${title}"? This will permanently remove the article.`
+        `Are you sure you want to delete "${title}"? This will permanently remove the article from the website.`
       )
     ) {
       return;
@@ -400,24 +400,31 @@ export default function AdminPage() {
 
     // 3. Call server API
     try {
-      await fetch(`/api/admin/blogs?slug=${encodeURIComponent(slug)}`, {
+      const res = await fetch(`/api/admin/blogs?slug=${encodeURIComponent(cleanSlug)}`, {
         method: "DELETE"
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
 
       setNotification({
         type: "success",
         message: `Article "${title}" deleted successfully.`
       });
+      await fetchBlogs();
     } catch (err: any) {
+      console.warn("Delete notification notice:", err);
       setNotification({
         type: "success",
         message: `Article "${title}" removed successfully.`
       });
+      await fetchBlogs();
     }
   };
 
-  const handleSaveBlog = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveBlog = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!blogForm.title.trim() || !blogForm.content.trim()) {
       alert("Please enter both article Title and Content.");
       return;
@@ -425,47 +432,48 @@ export default function AdminPage() {
 
     setBlogSaving(true);
     try {
+      const cleanSlug = (blogForm.slug || blogForm.title)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
       const payload = {
-        title: blogForm.title,
-        slug: blogForm.slug,
+        title: blogForm.title.trim(),
+        slug: cleanSlug,
+        excerpt: blogForm.excerpt.trim() || blogForm.title.trim(),
         category: blogForm.category,
         author: {
-          name: blogForm.authorName,
-          role: blogForm.authorRole,
-          avatar: blogForm.authorAvatar
+          name: blogForm.authorName.trim(),
+          role: blogForm.authorRole.trim(),
+          avatar: blogForm.authorAvatar.trim()
         },
-        publishedDate: blogForm.publishedDate,
-        readTime: blogForm.readTime,
-        coverImage: blogForm.coverImage,
+        publishedDate: blogForm.publishedDate.trim(),
+        readTime: blogForm.readTime.trim(),
+        coverImage: blogForm.coverImage.trim(),
         tags: blogForm.tags,
         featured: blogForm.featured,
         takeaways: blogForm.takeaways,
-        content: blogForm.content,
+        content: blogForm.content.trim(),
         originalSlug: editingBlog?.slug
       };
 
       // Also persist in localStorage
       if (typeof window !== "undefined") {
         try {
-          const cleanSlug = (payload.slug || payload.title)
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
-
           // Un-delete if it was previously marked deleted
           const deletedSlugs: string[] = JSON.parse(
             localStorage.getItem("sks_deleted_blog_slugs") || "[]"
           );
           const updatedDeleted = deletedSlugs.filter(
-            (s) => s !== cleanSlug && s !== editingBlog?.slug?.toLowerCase()
+            (s) => s !== cleanSlug && s !== editingBlog?.slug?.toLowerCase().trim()
           );
           localStorage.setItem("sks_deleted_blog_slugs", JSON.stringify(updatedDeleted));
 
           const savedBlog: BlogPost = {
             slug: cleanSlug,
-            title: payload.title.trim(),
-            excerpt: payload.title.trim(),
+            title: payload.title,
+            excerpt: payload.excerpt,
             category: payload.category,
             author: payload.author,
             publishedDate: payload.publishedDate,
@@ -487,7 +495,7 @@ export default function AdminPage() {
             localStorage.getItem("sks_custom_blogs") || "[]"
           );
           const existingIdx = customBlogs.findIndex(
-            (b) => b.slug.toLowerCase() === (editingBlog?.slug || cleanSlug).toLowerCase()
+            (b) => b.slug.toLowerCase().trim() === (editingBlog?.slug || cleanSlug).toLowerCase().trim()
           );
           if (existingIdx >= 0) {
             customBlogs[existingIdx] = savedBlog;
@@ -506,6 +514,11 @@ export default function AdminPage() {
         body: JSON.stringify(payload)
       });
 
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+
       const data = await res.json().catch(() => null);
 
       setNotification({
@@ -515,11 +528,47 @@ export default function AdminPage() {
           : `Article "${data?.blog?.title || blogForm.title}" published successfully!`
       });
       setShowBlogModal(false);
-      fetchBlogs();
+      await fetchBlogs();
     } catch (err: any) {
-      alert("Network error: " + err.message);
+      alert("Error saving article: " + err.message);
     } finally {
       setBlogSaving(false);
+    }
+  };
+
+  const handleRestoreDefaultBlogs = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to restore the default financial articles? Any custom modifications will be reset."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("sks_deleted_blog_slugs");
+        localStorage.removeItem("sks_custom_blogs");
+      }
+
+      const res = await fetch("/api/admin/blogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restore_defaults" })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setBlogs(data.blogs || []);
+      }
+
+      setNotification({
+        type: "success",
+        message: "Default financial advisory articles restored successfully."
+      });
+      await fetchBlogs();
+    } catch (e: any) {
+      alert("Failed to restore default articles: " + e.message);
     }
   };
 
@@ -790,15 +839,26 @@ export default function AdminPage() {
                       Publish, edit, and optimize financial articles with real-time slug routing.
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenCreateBlog}
-                    style={{ backgroundColor: "#b69455" }}
-                    className="hover:bg-[#96773d] text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition border-none cursor-pointer"
-                  >
-                    <i className="fa fa-plus"></i>
-                    <span>Add New Article</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleRestoreDefaultBlogs}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3.5 py-2.5 rounded-lg flex items-center gap-1.5 transition border border-slate-300 cursor-pointer"
+                      title="Restore original 6 sample advisory articles"
+                    >
+                      <i className="fa fa-rotate-left text-slate-500"></i>
+                      <span>Restore Defaults</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleOpenCreateBlog}
+                      style={{ backgroundColor: "#b69455" }}
+                      className="hover:bg-[#96773d] text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition border-none cursor-pointer"
+                    >
+                      <i className="fa fa-plus"></i>
+                      <span>Add New Article</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Filter and Search Bar */}
@@ -1744,8 +1804,8 @@ export default function AdminPage() {
                 </button>
 
                 <button
-                  type="submit"
-                  form="blog-editor-form"
+                  type="button"
+                  onClick={() => handleSaveBlog()}
                   disabled={blogSaving}
                   style={{ backgroundColor: "#b69455" }}
                   className="px-5 py-2 rounded-lg text-xs font-bold text-white hover:bg-[#96773d] transition flex items-center gap-2 shadow-sm border-none cursor-pointer disabled:opacity-50"

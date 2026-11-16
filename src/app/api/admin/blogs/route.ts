@@ -1,24 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-import { BlogPost } from "@/data/blogsData";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import os from "os";
+import { BlogPost, BLOGS_DATA } from "@/data/blogsData";
+import { supabase, supabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const BLOGS_FILE_PATH = path.join(process.cwd(), "src", "data", "blogs.json");
+const TMP_BLOGS_PATH = path.join(os.tmpdir(), "sks_blogs.json");
 
-// Helper to read blogs from Supabase, /tmp, or disk
+// Helper to read blogs from Supabase, os.tmpdir(), or disk
 async function readBlogs(): Promise<BlogPost[]> {
+  const sbClient = supabaseAdmin || supabase;
+
   // 1. Optional Supabase synchronization if configured
-  if (isSupabaseConfigured() && supabase) {
+  if (isSupabaseConfigured() && sbClient) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await sbClient
         .from("blogs")
         .select("*")
         .order("created_at", { ascending: false });
-      if (!error && data && data.length > 0) {
+
+      if (!error && Array.isArray(data) && data.length > 0) {
         return data.map((b: any) => ({
           slug: b.slug,
           title: b.title,
@@ -43,10 +48,9 @@ async function readBlogs(): Promise<BlogPost[]> {
     }
   }
 
-  // 2. Check /tmp/blogs.json (warm serverless instance fallback on Vercel)
+  // 2. Check os.tmpdir() sks_blogs.json (warm serverless instance fallback on Vercel)
   try {
-    const tmpPath = path.join("/tmp", "blogs.json");
-    const tmpRaw = await fs.readFile(tmpPath, "utf8");
+    const tmpRaw = await fs.readFile(TMP_BLOGS_PATH, "utf8");
     const parsed = JSON.parse(tmpRaw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       return parsed;
@@ -56,25 +60,34 @@ async function readBlogs(): Promise<BlogPost[]> {
   // 3. Fallback to src/data/blogs.json on disk
   try {
     const raw = await fs.readFile(BLOGS_FILE_PATH, "utf8");
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
   } catch (error) {
     console.error("Error reading blogs.json:", error);
-    return [];
   }
+
+  return BLOGS_DATA || [];
 }
 
 // Helper to write blogs to disk safely (gracefully handles read-only serverless filesystems)
 async function writeBlogs(blogs: BlogPost[]): Promise<void> {
-  // Always update /tmp on serverless environments like Vercel
+  // Always update os.tmpdir()
   try {
-    await fs.writeFile(path.join("/tmp", "blogs.json"), JSON.stringify(blogs, null, 2), "utf8");
-  } catch {}
+    await fs.writeFile(TMP_BLOGS_PATH, JSON.stringify(blogs, null, 2), "utf8");
+  } catch (err: any) {
+    console.warn("Notice: could not write to temporary blogs file:", err?.message);
+  }
 
   try {
     await fs.writeFile(BLOGS_FILE_PATH, JSON.stringify(blogs, null, 2), "utf8");
   } catch (err: any) {
     if (err?.code === "EROFS" || err?.message?.includes("read-only")) {
-      console.warn("Read-only filesystem detected (Vercel serverless runtime); safely stored in memory/tmp:", err.message);
+      console.warn(
+        "Read-only filesystem detected (Vercel serverless runtime); safely stored in memory/tmp:",
+        err.message
+      );
       return;
     }
     throw err;
@@ -99,10 +112,50 @@ export async function GET() {
   }
 }
 
-// POST: Create or Update a blog post
+// POST: Create, Update, or Restore blogs
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // Check for "restore_defaults" action
+    if (body?.action === "restore_defaults") {
+      const defaultBlogs = Array.isArray(BLOGS_DATA) && BLOGS_DATA.length > 0 ? BLOGS_DATA : [];
+      await writeBlogs(defaultBlogs);
+
+      const sbClient = supabaseAdmin || supabase;
+      if (isSupabaseConfigured() && sbClient) {
+        try {
+          for (const b of defaultBlogs) {
+            await sbClient.from("blogs").upsert([{
+              slug: b.slug,
+              title: b.title,
+              excerpt: b.excerpt,
+              category: b.category,
+              author_name: b.author.name,
+              author_role: b.author.role,
+              author_avatar: b.author.avatar,
+              published_at: b.publishedDate,
+              read_time: b.readTime,
+              cover_image: b.coverImage,
+              tags: b.tags,
+              is_featured: b.featured,
+              takeaways: b.takeaways,
+              content: b.content,
+              is_published: true
+            }]);
+          }
+        } catch (sbErr) {
+          console.warn("Supabase restore sync error:", sbErr);
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Default articles restored successfully.",
+        blogs: defaultBlogs
+      });
+    }
+
     const {
       slug,
       title,
@@ -166,10 +219,19 @@ export async function POST(req: NextRequest) {
       content: content.trim()
     };
 
-    // Optional Supabase synchronization if configured
-    if (isSupabaseConfigured() && supabase) {
+    // Supabase synchronization if configured
+    const sbClient = supabaseAdmin || supabase;
+    if (isSupabaseConfigured() && sbClient) {
       try {
-        await supabase.from("blogs").upsert([{
+        // If slug was renamed during edit, remove the old slug from Supabase
+        if (originalSlug && originalSlug.toLowerCase().trim() !== cleanSlug) {
+          await sbClient
+            .from("blogs")
+            .delete()
+            .eq("slug", originalSlug.toLowerCase().trim());
+        }
+
+        const { error: sbUpsertErr } = await sbClient.from("blogs").upsert([{
           slug: newBlog.slug,
           title: newBlog.title,
           excerpt: newBlog.excerpt,
@@ -183,8 +245,13 @@ export async function POST(req: NextRequest) {
           tags: newBlog.tags,
           is_featured: newBlog.featured,
           takeaways: newBlog.takeaways,
-          content: newBlog.content
+          content: newBlog.content,
+          is_published: true
         }]);
+
+        if (sbUpsertErr) {
+          console.warn("Supabase blog upsert warning:", sbUpsertErr);
+        }
       } catch (sbErr) {
         console.warn("Supabase blog sync notice:", sbErr);
       }
@@ -234,7 +301,15 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("slug");
+    let slug = searchParams.get("slug");
+
+    // Also support JSON body if slug is not in query params
+    if (!slug) {
+      try {
+        const body = await req.json();
+        slug = body?.slug;
+      } catch {}
+    }
 
     if (!slug) {
       return NextResponse.json({ error: "Slug parameter is required." }, { status: 400 });
@@ -242,10 +317,17 @@ export async function DELETE(req: NextRequest) {
 
     const cleanSlug = slug.toLowerCase().trim();
 
-    // Optional Supabase sync if configured
-    if (isSupabaseConfigured() && supabase) {
+    // Supabase sync if configured
+    const sbClient = supabaseAdmin || supabase;
+    if (isSupabaseConfigured() && sbClient) {
       try {
-        await supabase.from("blogs").delete().eq("slug", cleanSlug);
+        const { error: sbDelErr } = await sbClient
+          .from("blogs")
+          .delete()
+          .eq("slug", cleanSlug);
+        if (sbDelErr) {
+          console.warn("Supabase blog delete warning:", sbDelErr);
+        }
       } catch (sbErr) {
         console.warn("Supabase blog delete notice:", sbErr);
       }

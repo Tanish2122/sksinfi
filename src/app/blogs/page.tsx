@@ -211,8 +211,8 @@ function BlogsContent() {
                 {categories.map((cat) => {
                   const count =
                     cat === "All"
-                      ? BLOGS_DATA.length
-                      : BLOGS_DATA.filter((b) => b.category === cat).length;
+                      ? blogsList.length
+                      : blogsList.filter((b) => b.category === cat).length;
                   const isActive = selectedCategory === cat;
 
                   return (
