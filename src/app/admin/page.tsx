@@ -1307,19 +1307,68 @@ export default function AdminPage() {
       {/* ADD / EDIT BLOG ARTICLE MODAL                                        */}
       {/* ==================================================================== */}
       {showBlogModal && (
-        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-3 sm:p-5 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.75)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+            backdropFilter: "blur(4px)"
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              maxWidth: "960px",
+              width: "100%",
+              maxHeight: "92vh",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
+              overflow: "hidden",
+              border: "1px solid #e2e8f0"
+            }}
+          >
             {/* Modal Header */}
-            <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#b69455] flex items-center justify-center font-bold text-white text-sm">
+            <div
+              style={{
+                backgroundColor: "#0f172a",
+                color: "#ffffff",
+                padding: "18px 24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexShrink: 0,
+                borderBottom: "1px solid #1e293b"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    backgroundColor: "#b69455",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ffffff",
+                    fontSize: "16px",
+                    flexShrink: 0
+                  }}
+                >
                   <i className={`fa ${editingBlog ? "fa-pen-to-square" : "fa-plus"}`}></i>
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white m-0">
+                  <h3 style={{ fontSize: "17px", fontWeight: "700", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
                     {editingBlog ? "Edit Blog Article" : "Create New Blog Article"}
                   </h3>
-                  <p className="text-[11px] text-slate-400 m-0">
+                  <p style={{ fontSize: "12px", color: "#94a3b8", margin: "3px 0 0 0", lineHeight: 1.2 }}>
                     {editingBlog
                       ? `Updating: ${editingBlog.title}`
                       : "Fill in the details to publish a new financial advisory article"}
@@ -1328,35 +1377,77 @@ export default function AdminPage() {
               </div>
 
               {/* Mode Toggle (Edit vs Preview) */}
-              <div className="flex items-center gap-2">
-                <div className="bg-slate-800 p-0.5 rounded-lg flex items-center text-xs">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#1e293b",
+                    padding: "3px",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px"
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => setBlogModalTab("edit")}
-                    className={`px-3 py-1.5 rounded-md font-semibold border-none cursor-pointer transition ${
-                      blogModalTab === "edit"
-                        ? "bg-[#b69455] text-white"
-                        : "bg-transparent text-slate-400 hover:text-white"
-                    }`}
+                    style={{
+                      backgroundColor: blogModalTab === "edit" ? "#b69455" : "transparent",
+                      color: blogModalTab === "edit" ? "#ffffff" : "#94a3b8",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.15s ease"
+                    }}
                   >
-                    <i className="fa fa-code mr-1.5"></i> Editor
+                    <i className="fa fa-code"></i> Editor
                   </button>
                   <button
                     type="button"
                     onClick={() => setBlogModalTab("preview")}
-                    className={`px-3 py-1.5 rounded-md font-semibold border-none cursor-pointer transition ${
-                      blogModalTab === "preview"
-                        ? "bg-[#b69455] text-white"
-                        : "bg-transparent text-slate-400 hover:text-white"
-                    }`}
+                    style={{
+                      backgroundColor: blogModalTab === "preview" ? "#b69455" : "transparent",
+                      color: blogModalTab === "preview" ? "#ffffff" : "#94a3b8",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.15s ease"
+                    }}
                   >
-                    <i className="fa fa-eye mr-1.5"></i> Live Preview
+                    <i className="fa fa-eye"></i> Live Preview
                   </button>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setShowBlogModal(false)}
-                  className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border-none cursor-pointer transition ml-2"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    backgroundColor: "#1e293b",
+                    color: "#94a3b8",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "14px",
+                    transition: "all 0.15s ease"
+                  }}
+                  title="Close modal"
                 >
                   ✕
                 </button>
@@ -1364,14 +1455,14 @@ export default function AdminPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto flex-1">
+            <div style={{ padding: "24px", overflowY: "auto", flex: 1, backgroundColor: "#f8fafc" }}>
               {blogModalTab === "edit" ? (
-                <form id="blog-editor-form" onSubmit={handleSaveBlog} className="space-y-5">
+                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                   {/* Title & Slug */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                        Article Title <span className="text-red-500">*</span>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
+                        Article Title <span style={{ color: "#ef4444" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -1382,7 +1473,6 @@ export default function AdminPage() {
                           setBlogForm((prev) => ({
                             ...prev,
                             title: newTitle,
-                            // Auto-generate slug on new article if not manually edited
                             slug:
                               !editingBlog && (!prev.slug || prev.slug === "")
                                 ? newTitle
@@ -1392,17 +1482,38 @@ export default function AdminPage() {
                                 : prev.slug
                           }));
                         }}
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13.5px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                        URL Slug <span className="text-red-500">*</span>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
+                        URL Slug <span style={{ color: "#ef4444" }}>*</span>
                       </label>
-                      <div className="flex items-center">
-                        <span className="bg-slate-100 border border-r-0 border-slate-300 px-2.5 py-2 text-xs text-slate-500 rounded-l-lg select-none font-mono">
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <span
+                          style={{
+                            backgroundColor: "#f1f5f9",
+                            border: "1.5px solid #cbd5e1",
+                            borderRight: "none",
+                            borderRadius: "8px 0 0 8px",
+                            padding: "9px 12px",
+                            fontSize: "12px",
+                            color: "#64748b",
+                            fontFamily: "monospace",
+                            userSelect: "none"
+                          }}
+                        >
                           /blogs/
                         </span>
                         <input
@@ -1417,7 +1528,17 @@ export default function AdminPage() {
                                 .replace(/[^a-z0-9-]+/g, "-")
                             }))
                           }
-                          className="w-full border border-slate-300 rounded-r-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#b69455]"
+                          style={{
+                            width: "100%",
+                            border: "1.5px solid #cbd5e1",
+                            borderRadius: "0 8px 8px 0",
+                            padding: "9px 12px",
+                            fontSize: "12px",
+                            fontFamily: "monospace",
+                            color: "#0f172a",
+                            backgroundColor: "#ffffff",
+                            outline: "none"
+                          }}
                           required
                         />
                       </div>
@@ -1425,9 +1546,9 @@ export default function AdminPage() {
                   </div>
 
                   {/* Category, Read Time, Published Date */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                         Category
                       </label>
                       <select
@@ -1435,7 +1556,16 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, category: e.target.value }))
                         }
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       >
                         <option value="Loans">Loans</option>
                         <option value="Investments">Investments</option>
@@ -1447,7 +1577,7 @@ export default function AdminPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                         Estimated Read Time
                       </label>
                       <input
@@ -1457,12 +1587,21 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, readTime: e.target.value }))
                         }
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                         Published Date
                       </label>
                       <input
@@ -1472,15 +1611,24 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, publishedDate: e.target.value }))
                         }
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       />
                     </div>
                   </div>
 
                   {/* Author details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                         Author Name
                       </label>
                       <input
@@ -1490,12 +1638,21 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, authorName: e.target.value }))
                         }
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                         Author Title / Role
                       </label>
                       <input
@@ -1505,17 +1662,26 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, authorRole: e.target.value }))
                         }
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          width: "100%",
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       />
                     </div>
                   </div>
 
                   {/* Cover Image & Presets */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                       Cover Image URL or Path
                     </label>
-                    <div className="flex gap-2">
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                       <input
                         type="text"
                         placeholder="/images/homeloan.avif or https://..."
@@ -1523,39 +1689,81 @@ export default function AdminPage() {
                         onChange={(e) =>
                           setBlogForm((prev) => ({ ...prev, coverImage: e.target.value }))
                         }
-                        className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#b69455]"
+                        style={{
+                          flex: 1,
+                          border: "1.5px solid #cbd5e1",
+                          borderRadius: "8px",
+                          padding: "9px 12px",
+                          fontSize: "12px",
+                          fontFamily: "monospace",
+                          color: "#0f172a",
+                          backgroundColor: "#ffffff",
+                          outline: "none"
+                        }}
                       />
                       {blogForm.coverImage && (
                         <img
                           src={blogForm.coverImage}
                           alt="Cover Preview"
-                          className="w-10 h-9 object-cover rounded border border-slate-200"
+                          style={{
+                            width: "48px",
+                            height: "38px",
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            border: "1px solid #cbd5e1",
+                            flexShrink: 0
+                          }}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "/images/homeloan.avif";
                           }}
                         />
                       )}
                     </div>
-                    {/* Quick Presets */}
-                    <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-500">
-                      <span>Presets:</span>
-                      {PRESET_COVERS.map((preset) => (
-                        <button
-                          key={preset.url}
-                          type="button"
-                          onClick={() =>
-                            setBlogForm((prev) => ({ ...prev, coverImage: preset.url }))
-                          }
-                          className="bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 text-[11px] border-none cursor-pointer transition"
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
+
+                    {/* Presets */}
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+                      <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#64748b" }}>Quick Presets:</span>
+                      {PRESET_COVERS.map((preset) => {
+                        const isSelected = blogForm.coverImage === preset.url;
+                        return (
+                          <button
+                            key={preset.url}
+                            type="button"
+                            onClick={() =>
+                              setBlogForm((prev) => ({ ...prev, coverImage: preset.url }))
+                            }
+                            style={{
+                              backgroundColor: isSelected ? "#094b57" : "#e2e8f0",
+                              color: isSelected ? "#ffffff" : "#334155",
+                              border: isSelected ? "1px solid #094b57" : "1px solid #cbd5e1",
+                              padding: "4px 10px",
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Featured Checkbox */}
-                  <div className="flex items-center gap-2.5 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      backgroundColor: "#ffffff",
+                      border: "1.5px solid #e2e8f0",
+                      borderRadius: "10px",
+                      padding: "10px 14px",
+                      margin: "4px 0"
+                    }}
+                  >
                     <input
                       type="checkbox"
                       id="featured-checkbox"
@@ -1563,19 +1771,33 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setBlogForm((prev) => ({ ...prev, featured: e.target.checked }))
                       }
-                      className="w-4 h-4 text-[#b69455] rounded cursor-pointer"
+                      style={{
+                        width: "18px",
+                        height: "18px",
+                        margin: 0,
+                        cursor: "pointer",
+                        accentColor: "#b69455",
+                        flexShrink: 0
+                      }}
                     />
                     <label
                       htmlFor="featured-checkbox"
-                      className="text-xs font-semibold text-slate-800 cursor-pointer select-none"
+                      style={{
+                        fontSize: "12.5px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        cursor: "pointer",
+                        margin: 0,
+                        userSelect: "none"
+                      }}
                     >
-                      ⭐ Mark as Featured Article (Prominently displayed at the top of the blog page)
+                      ⭐ Mark as Featured Article (Prominently pinned at the top of the blog page)
                     </label>
                   </div>
 
                   {/* Excerpt */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                       Short Excerpt & SEO Meta Description
                     </label>
                     <textarea
@@ -1585,13 +1807,23 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setBlogForm((prev) => ({ ...prev, excerpt: e.target.value }))
                       }
-                      className="w-full border border-slate-300 rounded-lg p-3 text-xs focus:outline-none focus:border-[#b69455]"
+                      style={{
+                        width: "100%",
+                        border: "1.5px solid #cbd5e1",
+                        borderRadius: "8px",
+                        padding: "10px 12px",
+                        fontSize: "13px",
+                        color: "#0f172a",
+                        backgroundColor: "#ffffff",
+                        outline: "none",
+                        lineHeight: 1.5
+                      }}
                     />
                   </div>
 
                   {/* Key Takeaways */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                       Key Takeaways & Highlights (One per line)
                     </label>
                     <textarea
@@ -1601,13 +1833,24 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setBlogForm((prev) => ({ ...prev, takeaways: e.target.value }))
                       }
-                      className="w-full border border-slate-300 rounded-lg p-3 text-xs font-mono focus:outline-none focus:border-[#b69455]"
+                      style={{
+                        width: "100%",
+                        border: "1.5px solid #cbd5e1",
+                        borderRadius: "8px",
+                        padding: "10px 12px",
+                        fontSize: "12.5px",
+                        fontFamily: "monospace",
+                        color: "#0f172a",
+                        backgroundColor: "#ffffff",
+                        outline: "none",
+                        lineHeight: 1.5
+                      }}
                     />
                   </div>
 
                   {/* Tags */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", marginBottom: "6px" }}>
                       Tags / Keywords (Comma-separated)
                     </label>
                     <input
@@ -1617,19 +1860,28 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setBlogForm((prev) => ({ ...prev, tags: e.target.value }))
                       }
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#b69455]"
+                      style={{
+                        width: "100%",
+                        border: "1.5px solid #cbd5e1",
+                        borderRadius: "8px",
+                        padding: "9px 12px",
+                        fontSize: "13px",
+                        color: "#0f172a",
+                        backgroundColor: "#ffffff",
+                        outline: "none"
+                      }}
                     />
                   </div>
 
                   {/* Rich Content Editor */}
                   <div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                      <label className="text-xs font-bold text-slate-700 uppercase m-0">
-                        Article Content (HTML / Rich Text) <span className="text-red-500">*</span>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "6px" }}>
+                      <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em", color: "#475569", margin: 0 }}>
+                        Article Content (HTML / Rich Text) <span style={{ color: "#ef4444" }}>*</span>
                       </label>
 
                       {/* Quick formatting toolbar */}
-                      <div className="flex flex-wrap items-center gap-1">
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px" }}>
                         <button
                           type="button"
                           onClick={() =>
@@ -1637,7 +1889,16 @@ export default function AdminPage() {
                               "<h2>Section Subtitle Here</h2>\n<p>Explain the detailed regulatory or advisory concept here...</p>"
                             )
                           }
-                          className="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded text-slate-700 border-none cursor-pointer"
+                          style={{
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            cursor: "pointer"
+                          }}
                         >
                           + H2 Heading
                         </button>
@@ -1648,7 +1909,16 @@ export default function AdminPage() {
                               "<h3>Sub-topic Detail</h3>\n<p>Elaborate specific points...</p>"
                             )
                           }
-                          className="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded text-slate-700 border-none cursor-pointer"
+                          style={{
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            cursor: "pointer"
+                          }}
                         >
                           + H3
                         </button>
@@ -1659,7 +1929,16 @@ export default function AdminPage() {
                               "<ul>\n  <li><strong>Point 1:</strong> Benefit explanation</li>\n  <li><strong>Point 2:</strong> Documentation prerequisite</li>\n</ul>"
                             )
                           }
-                          className="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded text-slate-700 border-none cursor-pointer"
+                          style={{
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            cursor: "pointer"
+                          }}
                         >
                           + Bullet List
                         </button>
@@ -1670,7 +1949,16 @@ export default function AdminPage() {
                               '<div style="background:#f1f7f8;border-left:4px solid #094b57;padding:16px;border-radius:8px;margin:20px 0;">\n  <strong>Expert Recommendation:</strong> Consult SKS INFI advisors to verify your eligibility before formal credit submission.\n</div>'
                             )
                           }
-                          className="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded text-[#094b57] font-semibold border-none cursor-pointer"
+                          style={{
+                            backgroundColor: "#f1f7f8",
+                            border: "1px solid #99f6e4",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            color: "#094b57",
+                            cursor: "pointer"
+                          }}
                         >
                           + Callout Box
                         </button>
@@ -1684,48 +1972,70 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setBlogForm((prev) => ({ ...prev, content: e.target.value }))
                       }
-                      className="w-full border border-slate-300 rounded-lg p-3 text-xs font-mono leading-relaxed focus:outline-none focus:border-[#b69455]"
+                      style={{
+                        width: "100%",
+                        border: "1.5px solid #cbd5e1",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        fontSize: "13px",
+                        fontFamily: "monospace",
+                        lineHeight: 1.6,
+                        color: "#0f172a",
+                        backgroundColor: "#ffffff",
+                        outline: "none"
+                      }}
                       required
                     />
                   </div>
-                </form>
+                </div>
               ) : (
                 /* LIVE ARTICLE PREVIEW TAB */
-                <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 space-y-6">
+                <div style={{ backgroundColor: "#ffffff", borderRadius: "12px", padding: "24px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Category & Date */}
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="px-3 py-1 rounded-full font-bold bg-[#eef7f8] text-[#094b57]">
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px" }}>
+                    <span
+                      style={{
+                        padding: "4px 12px",
+                        borderRadius: "50px",
+                        fontWeight: "700",
+                        backgroundColor: "rgba(9, 75, 87, 0.1)",
+                        color: "#094b57",
+                        fontSize: "11px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em"
+                      }}
+                    >
                       {blogForm.category}
                     </span>
-                    <span className="text-slate-500">{blogForm.publishedDate}</span>
-                    <span className="text-slate-400">•</span>
-                    <span className="text-slate-500">{blogForm.readTime}</span>
+                    <span style={{ color: "#64748b" }}>{blogForm.publishedDate}</span>
+                    <span style={{ color: "#cbd5e1" }}>•</span>
+                    <span style={{ color: "#64748b" }}>{blogForm.readTime}</span>
                   </div>
 
                   {/* Title */}
-                  <h1 className="text-2xl sm:text-3xl font-bold text-[#094b57] leading-tight m-0">
+                  <h1 style={{ fontSize: "26px", fontWeight: "700", color: "#094b57", lineHeight: 1.3, margin: 0 }}>
                     {blogForm.title || "Untitled Article"}
                   </h1>
 
                   {/* Excerpt */}
                   {blogForm.excerpt && (
-                    <p className="text-sm text-slate-600 leading-relaxed italic m-0">
+                    <p style={{ fontSize: "14px", color: "#475569", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>
                       {blogForm.excerpt}
                     </p>
                   )}
 
                   {/* Author Card */}
-                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 w-fit">
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", width: "fit-content" }}>
                     <img
                       src={blogForm.authorAvatar || "/images/user (1).png"}
                       alt={blogForm.authorName}
-                      className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                      style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", border: "1px solid #cbd5e1" }}
                     />
                     <div>
-                      <div className="text-xs font-bold text-slate-900">
+                      <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>
                         {blogForm.authorName}
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div style={{ fontSize: "11px", color: "#64748b" }}>
                         {blogForm.authorRole}
                       </div>
                     </div>
@@ -1736,7 +2046,7 @@ export default function AdminPage() {
                     <img
                       src={blogForm.coverImage}
                       alt={blogForm.title}
-                      className="w-full max-h-80 object-cover rounded-xl shadow-sm"
+                      style={{ width: "100%", maxHeight: "320px", objectFit: "cover", borderRadius: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "/images/homeloan.avif";
                       }}
@@ -1745,11 +2055,11 @@ export default function AdminPage() {
 
                   {/* Key Takeaways Box */}
                   {blogForm.takeaways && (
-                    <div className="bg-emerald-50/70 border-l-4 border-emerald-600 p-4 rounded-r-xl">
-                      <div className="font-bold text-xs uppercase tracking-wider text-emerald-900 mb-2">
+                    <div style={{ backgroundColor: "#f0fdf4", borderLeft: "4px solid #16a34a", padding: "16px", borderRadius: "0 10px 10px 0" }}>
+                      <div style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#166534", marginBottom: "8px" }}>
                         Key Takeaways
                       </div>
-                      <ul className="text-xs space-y-1.5 text-emerald-800 m-0 pl-4">
+                      <ul style={{ fontSize: "12.5px", color: "#15803d", margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "6px" }}>
                         {blogForm.takeaways
                           .split("\n")
                           .filter(Boolean)
@@ -1762,18 +2072,18 @@ export default function AdminPage() {
 
                   {/* Rendered HTML Content */}
                   <div
-                    className="prose prose-sm max-w-none text-slate-800 leading-relaxed bg-white p-6 rounded-xl border border-slate-200"
+                    style={{ lineHeight: 1.7, fontSize: "14px", color: "#334155" }}
                     dangerouslySetInnerHTML={{ __html: blogForm.content }}
                   />
 
                   {/* Tags */}
                   {blogForm.tags && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                      <span className="text-xs font-bold text-slate-500">Tags:</span>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", paddingTop: "8px" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Tags:</span>
                       {blogForm.tags.split(",").map((t, i) => (
                         <span
                           key={i}
-                          className="text-[11px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded"
+                          style={{ fontSize: "11px", backgroundColor: "#e2e8f0", color: "#334155", padding: "2px 8px", borderRadius: "4px" }}
                         >
                           {t.trim()}
                         </span>
@@ -1785,20 +2095,40 @@ export default function AdminPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
-              <div className="text-xs text-slate-500">
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                borderTop: "1px solid #e2e8f0",
+                padding: "14px 24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexShrink: 0
+              }}
+            >
+              <div style={{ fontSize: "12px", color: "#64748b" }}>
                 {blogModalTab === "edit" ? (
-                  <span>Click 'Live Preview' above to see formatted article layout.</span>
+                  <span>Click <strong>'Live Preview'</strong> above to see formatted article layout.</span>
                 ) : (
-                  <span>Reviewing layout preview. Switch back to Edit to make changes.</span>
+                  <span>Reviewing layout preview. Switch back to <strong>'Editor'</strong> to make changes.</span>
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <button
                   type="button"
                   onClick={() => setShowBlogModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition bg-white cursor-pointer"
+                  style={{
+                    padding: "8px 18px",
+                    border: "1.5px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontSize: "12.5px",
+                    fontWeight: "600",
+                    color: "#475569",
+                    backgroundColor: "#ffffff",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease"
+                  }}
                 >
                   Cancel
                 </button>
@@ -1807,12 +2137,32 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => handleSaveBlog()}
                   disabled={blogSaving}
-                  style={{ backgroundColor: "#b69455" }}
-                  className="px-5 py-2 rounded-lg text-xs font-bold text-white hover:bg-[#96773d] transition flex items-center gap-2 shadow-sm border-none cursor-pointer disabled:opacity-50"
+                  style={{
+                    padding: "8px 22px",
+                    backgroundColor: "#b69455",
+                    color: "#ffffff",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontSize: "12.5px",
+                    fontWeight: "700",
+                    cursor: blogSaving ? "not-allowed" : "pointer",
+                    opacity: blogSaving ? 0.6 : 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    boxShadow: "0 2px 4px rgba(182, 148, 85, 0.3)",
+                    transition: "all 0.15s ease"
+                  }}
                 >
                   {blogSaving && <i className="fa fa-spinner fa-spin"></i>}
                   <span>
-                    {editingBlog ? "Save Article Changes" : "Publish Article Now"}
+                    {editingBlog
+                      ? blogSaving
+                        ? "Saving Changes..."
+                        : "Save Article Changes"
+                      : blogSaving
+                      ? "Publishing..."
+                      : "Publish Article Now"}
                   </span>
                 </button>
               </div>

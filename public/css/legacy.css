@@ -433,17 +433,15 @@ body {
             text-decoration: none;
         }
 
-        /* Form Styling */
-        form {
+        /* Form Styling (Scoped to legacy modal) */
+        .legacy-modal-form,
+        .modal-content.legacy-form {
             display: flex;
             flex-direction: column;
         }
 
-        /* form label {
-        margin: 10px 0 5px;
-    } */
-
-        form input {
+        .legacy-modal-form input,
+        .modal-content.legacy-form input {
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
@@ -451,11 +449,13 @@ body {
             width: 100% !important;
         }
 
-        form select {
+        .legacy-modal-form select,
+        .modal-content.legacy-form select {
             width: 100% !important;
         }
 
-        form button {
+        .legacy-modal-form button.legacy-btn,
+        .modal-content.legacy-form button.legacy-btn {
             padding: 10px;
             border: none;
             background-color: #4CAF50;
@@ -464,7 +464,8 @@ body {
             cursor: pointer;
         }
 
-        form button:hover {
+        .legacy-modal-form button.legacy-btn:hover,
+        .modal-content.legacy-form button.legacy-btn:hover {
             background-color: #45a049;
         }
 
@@ -11496,17 +11497,20 @@ input[type="number"] {
   text-decoration: none;
 }
 
-/* Form Styling */
-form {
+/* Form Styling (Scoped to legacy modal) */
+.legacy-modal form,
+.modal-content.legacy-form {
   display: flex;
   flex-direction: column;
 }
 
-form label {
+.legacy-modal form label,
+.modal-content.legacy-form label {
   margin: 7px 0 5px;
 }
 
-form input {
+.legacy-modal form input,
+.modal-content.legacy-form input {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
@@ -11514,11 +11518,13 @@ form input {
   width: 100% !important;
 }
 
-form select {
+.legacy-modal form select,
+.modal-content.legacy-form select {
   width: 100% !important;
 }
 
-form button {
+.legacy-modal form button.legacy-btn,
+.modal-content.legacy-form button.legacy-btn {
   padding: 10px;
   border: none;
   background-color: #4caf50;
@@ -11527,7 +11533,8 @@ form button {
   cursor: pointer;
 }
 
-form button:hover {
+.legacy-modal form button.legacy-btn:hover,
+.modal-content.legacy-form button.legacy-btn:hover {
   background-color: #45a049;
 }
 
