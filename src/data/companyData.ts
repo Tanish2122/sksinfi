@@ -105,7 +105,7 @@ export const companyInfo = {
       comment: "Hassle free service to my clients, Payment of our commission without follow-up. Best Loan DSA in India.",
       service: "Loan DSA & Partner Payouts"
     },
-    {
+        {
       id: "8",
       name: "BL Singhania",
       location: "Jaipur, Rajasthan",
@@ -113,6 +113,33 @@ export const companyInfo = {
       rating: 5,
       comment: "I have been associated with SKS INFI for last 7 years and facilitate loan to Indian Residents & NRIs through him for more than ₹ 85 Crore ( Approx). Best Loan consulting firm in India for both Indian residents & NRIs.",
       service: "Resident & NRI Loan Advisory"
+    },
+    {
+      id: "9",
+      name: "Hardik Babel",
+      location: "London, UK",
+      role: "NRI in London | Mutual Fund & SIP Investor",
+      rating: 5,
+      comment: "One of my friend suggested name of SKSINFI in London (UK) to connect for investment in mutual fund. When I connected team SKSINFI explain me the rule of 25:25:50 ( FDs, G-SECs & BOND, EQUITY & MUTUAL FUND ). In- depth research by team SKSINFI provides me full detail and then immediately I started SIP of ₹ 35 K per month. Really a best financial analyst.",
+      service: "NRI Desk • Mutual Fund & SIP"
+    },
+    {
+      id: "10",
+      name: "Sanjay Bunkar",
+      location: "Jaipur, Rajasthan",
+      role: "SANJAY BUNKAR • LOAN DSA | Channel Partner",
+      rating: 5,
+      comment: "My name is Sanjay Bunkar and associated with SKS INFI for last 3 years. Whenever I inform him to meet my HNI clients, CA AARUN JAIN always available to meet and explain as well as proper satisfaction. Very intelligent financial consultant.",
+      service: "Loan DSA & HNI Consultancy"
+    },
+    {
+      id: "11",
+      name: "Akshay (अक्षय)",
+      location: "Chennai, Tamil Nadu",
+      role: "Health & Term Insurance Client",
+      rating: 5,
+      comment: "मैंने इनके माध्यम से हेल्थ एवं टर्म इंश्योरेंस पॉलिसी ली है। SKS INFI की टीम ने मेरी हेल्थ इंश्योरेंस क्लेम प्रक्रिया को बिना किसी परेशानी के पूरा करवाने में पूरा सहयोग दिया। इनकी बेहतरीन सेवा और सहयोग के कारण मुझे पूरी मानसिक शांति मिली। वास्तव में, SKS INFI एक उत्कृष्ट एवं ग्राहक सेवा के प्रति समर्पित संस्था है।",
+      service: "Health & Term Insurance Claim"
     }
   ],
   faqs: [
