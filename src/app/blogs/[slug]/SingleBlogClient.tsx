@@ -23,21 +23,50 @@ import {
 } from "lucide-react";
 
 interface SingleBlogClientProps {
-  post: BlogPost;
+  post: BlogPost | null;
+  slug?: string;
   relatedPosts: BlogPost[];
 }
 
-export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClientProps) {
+export default function SingleBlogClient({ post: initialPost, slug, relatedPosts }: SingleBlogClientProps) {
+  const [post, setPost] = useState<BlogPost | null>(initialPost);
+  const [loading, setLoading] = useState<boolean>(!initialPost);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalCategory, setModalCategory] = useState<string | undefined>(post.category);
+  const [modalCategory, setModalCategory] = useState<string | undefined>(initialPost?.category || "Loans");
   const [copied, setCopied] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [isDeleted, setIsDeleted] = useState(false);
   const articleRef = useRef<HTMLDivElement>(null);
 
+  // Check client-side localStorage if not found on server
+  useEffect(() => {
+    if (!initialPost && typeof window !== "undefined") {
+      try {
+        const cleanTargetSlug = (slug || "").toLowerCase().trim();
+        const customBlogs: BlogPost[] = JSON.parse(
+          localStorage.getItem("sks_custom_blogs") || "[]"
+        );
+        const found = customBlogs.find(
+          (b) =>
+            b.slug.toLowerCase().trim() === cleanTargetSlug ||
+            b.slug.toLowerCase().trim().replace(/-/g, "") === cleanTargetSlug.replace(/-/g, "") ||
+            b.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === cleanTargetSlug
+        );
+        if (found) {
+          setPost(found);
+          setModalCategory(found.category);
+        }
+      } catch (e) {
+        console.warn("Failed checking localStorage for blog post:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [initialPost, slug]);
+
   // Check if blog was deleted locally
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (post && typeof window !== "undefined") {
       try {
         const deletedSlugs: string[] = JSON.parse(
           localStorage.getItem("sks_deleted_blog_slugs") || "[]"
@@ -47,7 +76,7 @@ export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClien
         }
       } catch {}
     }
-  }, [post.slug]);
+  }, [post]);
 
   // Reading progress bar
   useEffect(() => {
@@ -72,6 +101,21 @@ export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClien
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white text-[#333333]">
+        <Navbar onOpenEnquiry={() => setModalOpen(true)} />
+        <main className="flex-1 flex items-center justify-center py-20 px-4">
+          <div className="text-center text-slate-500 font-semibold text-sm">
+            <div className="w-8 h-8 border-3 border-[#b69455] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            Loading advisory article...
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (isDeleted) {
     return (
       <div className="min-h-screen flex flex-col bg-white text-[#333333]">
@@ -87,12 +131,89 @@ export default function SingleBlogClient({ post, relatedPosts }: SingleBlogClien
             </p>
             <Link
               href="/blogs"
-              className="inline-flex items-center justify-center gap-2 bg-[#094b57] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#073842] transition"
+              className="inline-flex items-center justify-center gap-2 bg-[#094b57] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#073842] transition no-underline"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Explore All Blogs</span>
             </Link>
           </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#f8fafc] text-[#333333]">
+        <Navbar onOpenEnquiry={() => setModalOpen(true)} />
+        <main className="flex-1 py-16 px-4">
+          <div className="max-w-2xl mx-auto text-center bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm mb-12">
+            <div className="w-16 h-16 bg-amber-50 text-[#b69455] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-amber-100">
+              <HelpCircle className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+              Article Not Found or Moved
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+              The requested advisory article <code className="bg-slate-100 px-2 py-0.5 rounded text-slate-800 text-xs font-mono">{slug || "article"}</code> could not be found. It may have been updated, renamed, or relocated.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/blogs"
+                style={{ color: "#ffffff", backgroundColor: "#094b57", textDecoration: "none" }}
+                className="inline-flex items-center justify-center gap-2 hover:bg-[#073942] px-6 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Explore All Articles</span>
+              </Link>
+              <Link
+                href="/"
+                style={{ color: "#1e293b", backgroundColor: "#f1f5f9", textDecoration: "none" }}
+                className="inline-flex items-center justify-center gap-2 hover:bg-slate-200 px-5 py-2.5 rounded-xl font-semibold text-sm transition"
+              >
+                <span>Return Home</span>
+              </Link>
+            </div>
+          </div>
+
+          {relatedPosts && relatedPosts.length > 0 && (
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">
+                Popular Financial Advisory Articles
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {relatedPosts.map((rel) => (
+                  <Link
+                    key={rel.slug}
+                    href={`/blogs/${rel.slug}`}
+                    className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col no-underline"
+                  >
+                    <div className="h-40 overflow-hidden bg-slate-100">
+                      <img
+                        src={rel.coverImage || "/images/homeloan.avif"}
+                        alt={rel.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="inline-block text-[11px] font-bold text-[#094b57] bg-teal-50 px-2 py-0.5 rounded-full mb-2 uppercase">
+                          {rel.category}
+                        </span>
+                        <h3 className="text-sm font-bold text-slate-800 group-hover:text-[#094b57] line-clamp-2 transition mb-2">
+                          {rel.title}
+                        </h3>
+                      </div>
+                      <span className="text-xs text-[#b69455] font-semibold flex items-center gap-1 mt-3">
+                        Read Guide <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
         <Footer />
       </div>

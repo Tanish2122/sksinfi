@@ -77,14 +77,18 @@ export default function AdminPage() {
   const [editorMode, setEditorMode] = useState<"rich" | "html">("rich");
   const editorRef = React.useRef<HTMLDivElement>(null);
 
-  // Sync contentEditable when modal opens or editingBlog changes
+  // Sync contentEditable when modal opens, editorMode switches, or editingBlog changes
   useEffect(() => {
-    if (showBlogModal && editorRef.current) {
-      if (editorRef.current.innerHTML !== blogForm.content) {
-        editorRef.current.innerHTML = blogForm.content;
+    if (showBlogModal && editorRef.current && editorMode === "rich") {
+      const targetContent =
+        blogForm.content && blogForm.content.trim() !== ""
+          ? blogForm.content
+          : "<p><br></p>";
+      if (editorRef.current.innerHTML !== targetContent) {
+        editorRef.current.innerHTML = targetContent;
       }
     }
-  }, [showBlogModal, editingBlog]);
+  }, [showBlogModal, editorMode, editingBlog]);
 
   const executeEditorCommand = (command: string, value: string | undefined = undefined) => {
     if (typeof document !== "undefined") {
@@ -98,6 +102,133 @@ export default function AdminPage() {
           content: editorRef.current?.innerHTML || ""
         }));
       }
+    }
+  };
+
+  // Robust Clipboard Paste Handler
+  const handleEditorPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const clipboardHtml = e.clipboardData.getData("text/html");
+    const clipboardText = e.clipboardData.getData("text/plain");
+
+    let contentToInsert = "";
+
+    if (clipboardHtml && clipboardHtml.trim() !== "") {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(clipboardHtml, "text/html");
+        
+        // Strip out scripts, styles, links, iframes for security and clean styling
+        const unwanted = doc.querySelectorAll("script, style, meta, link, noscript, iframe");
+        unwanted.forEach((el) => el.remove());
+
+        const cleanBody = doc.body ? doc.body.innerHTML : clipboardHtml;
+        contentToInsert = cleanBody.trim() || clipboardText;
+      } catch {
+        contentToInsert = clipboardHtml;
+      }
+    } else if (clipboardText) {
+      const paragraphs = clipboardText
+        .split(/\r?\n\r?\n/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      if (paragraphs.length > 1) {
+        contentToInsert = paragraphs
+          .map((p) => `<p>${p.replace(/\r?\n/g, "<br>")}</p>`)
+          .join("");
+      } else if (clipboardText.includes("\n")) {
+        contentToInsert = `<p>${clipboardText.replace(/\r?\n/g, "<br>")}</p>`;
+      } else {
+        contentToInsert = clipboardText;
+      }
+    }
+
+    if (!contentToInsert) return;
+
+    if (editorRef.current) {
+      editorRef.current.focus();
+
+      if (
+        !editorRef.current.innerHTML ||
+        editorRef.current.innerHTML.trim() === "" ||
+        editorRef.current.innerHTML === "<p><br></p>"
+      ) {
+        editorRef.current.innerHTML = contentToInsert;
+      } else {
+        const inserted = document.execCommand("insertHTML", false, contentToInsert);
+        if (!inserted) {
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = contentToInsert;
+            const frag = document.createDocumentFragment();
+            while (tempDiv.firstChild) {
+              frag.appendChild(tempDiv.firstChild);
+            }
+            range.insertNode(frag);
+          } else {
+            editorRef.current.innerHTML += contentToInsert;
+          }
+        }
+      }
+
+      const updated = editorRef.current.innerHTML;
+      setBlogForm((prev) => ({
+        ...prev,
+        content: updated
+      }));
+    }
+  };
+
+  // Dedicated Toolbar Paste Action (Mobile / Desktop Quick Paste)
+  const handleToolbarPaste = async () => {
+    try {
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+      const text = await navigator.clipboard.readText();
+      if (!text || text.trim() === "") {
+        alert("Clipboard is empty or contains non-text data. You can also paste directly into the box with Ctrl+V.");
+        return;
+      }
+
+      const paragraphs = text
+        .split(/\r?\n\r?\n/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      const formatted =
+        paragraphs.length > 1
+          ? paragraphs.map((p) => `<p>${p.replace(/\r?\n/g, "<br>")}</p>`).join("")
+          : text.includes("\n")
+          ? `<p>${text.replace(/\r?\n/g, "<br>")}</p>`
+          : text;
+
+      if (editorRef.current) {
+        if (
+          !editorRef.current.innerHTML ||
+          editorRef.current.innerHTML.trim() === "" ||
+          editorRef.current.innerHTML === "<p><br></p>"
+        ) {
+          editorRef.current.innerHTML = formatted;
+        } else {
+          document.execCommand("insertHTML", false, formatted);
+        }
+        setBlogForm((prev) => ({
+          ...prev,
+          content: editorRef.current?.innerHTML || ""
+        }));
+        setNotification({
+          type: "success",
+          message: "Clipboard text successfully pasted into article body!"
+        });
+      }
+    } catch {
+      alert("Please click inside the editor box and press Ctrl+V (or Command+V on Mac) to paste.");
     }
   };
   const [notification, setNotification] = useState<{
@@ -342,6 +473,7 @@ export default function AdminPage() {
     setEditingBlog(null);
     setBlogForm({
       ...DEFAULT_BLOG_FORM,
+      content: "<p><br></p>",
       publishedDate: new Date().toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
@@ -439,7 +571,18 @@ export default function AdminPage() {
 
   const handleSaveBlog = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!blogForm.title.trim() || !blogForm.content.trim()) {
+
+    const liveContent =
+      editorMode === "rich" && editorRef.current
+        ? editorRef.current.innerHTML.trim()
+        : blogForm.content.trim();
+
+    if (
+      !blogForm.title.trim() ||
+      !liveContent ||
+      liveContent === "<p><br></p>" ||
+      liveContent === "<br>"
+    ) {
       alert("Please enter both article Title and Content.");
       return;
     }
@@ -468,7 +611,7 @@ export default function AdminPage() {
         tags: blogForm.tags,
         featured: blogForm.featured,
         takeaways: blogForm.takeaways,
-        content: blogForm.content.trim(),
+        content: liveContent,
         originalSlug: editingBlog?.slug
       };
 
@@ -1507,11 +1650,17 @@ export default function AdminPage() {
 
                     {/* Rich Editor Outer Card (Matching User Screenshot) */}
                     <div
+                      onClick={() => {
+                        if (editorMode === "rich" && editorRef.current) {
+                          editorRef.current.focus();
+                        }
+                      }}
                       style={{
                         border: "1px solid #e2e8f0",
                         borderRadius: "14px",
                         overflow: "hidden",
-                        backgroundColor: "#ffffff"
+                        backgroundColor: "#ffffff",
+                        cursor: "text"
                       }}
                     >
                       {/* Primary Toolbar */}
@@ -1723,6 +1872,29 @@ export default function AdminPage() {
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                           </button>
+
+                          {/* Quick Paste Button */}
+                          <button
+                            type="button"
+                            onClick={handleToolbarPaste}
+                            title="Paste text from clipboard"
+                            style={{
+                              backgroundColor: "#f8fafc",
+                              border: "1px solid #cbd5e1",
+                              borderRadius: "6px",
+                              padding: "3px 8px",
+                              color: "#334155",
+                              cursor: "pointer",
+                              fontSize: "11px",
+                              fontWeight: "700",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px"
+                            }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                            <span>Paste Clipboard</span>
+                          </button>
                         </div>
 
                         <button
@@ -1748,6 +1920,8 @@ export default function AdminPage() {
                           ref={editorRef}
                           contentEditable={true}
                           suppressContentEditableWarning={true}
+                          tabIndex={0}
+                          onPaste={handleEditorPaste}
                           onInput={(e) => {
                             setBlogForm((prev) => ({
                               ...prev,
@@ -1770,6 +1944,7 @@ export default function AdminPage() {
                           rows={12}
                           value={blogForm.content}
                           onChange={(e) => setBlogForm((prev) => ({ ...prev, content: e.target.value }))}
+                          placeholder="Paste HTML or raw markdown content here..."
                           style={{
                             width: "100%",
                             minHeight: "260px",

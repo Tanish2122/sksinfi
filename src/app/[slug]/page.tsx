@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import LegacyPageRenderer from "@/components/LegacyPageRenderer";
 import pagesDataRaw from "@/data/pagesContent.json";
+import { resolveBlogPost } from "@/lib/blogsResolver";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,6 +35,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const page = pagesData[cleanSlug];
 
   if (!page) {
+    const blogPost = await resolveBlogPost(cleanSlug);
+    if (blogPost) {
+      return {
+        title: `${blogPost.title} | SKS INFI`,
+        description: blogPost.excerpt,
+        alternates: {
+          canonical: `https://www.sksinfi.com/blogs/${blogPost.slug}`
+        }
+      };
+    }
     return {
       title: "SKS INFI | Financial Consultant in Jaipur",
       description: "SKS INFI provides expert financial planning, investment, loan and insurance services as a trusted Financial Consultant in Jaipur."
@@ -109,6 +120,10 @@ export default async function DynamicLegacyPage({ params }: PageProps) {
   const page = pagesData[cleanSlug];
 
   if (!page) {
+    const blogPost = await resolveBlogPost(cleanSlug);
+    if (blogPost) {
+      redirect(`/blogs/${blogPost.slug}`);
+    }
     notFound();
   }
 
