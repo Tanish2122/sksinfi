@@ -1,88 +1,72 @@
 import React from "react";
 import type { Metadata } from "next";
-import ContactClient from "./ContactClient";
+import LegacyPageRenderer from "@/components/LegacyPageRenderer";
+import pagesDataRaw from "@/data/pagesContent.json";
+
+const pagesData = pagesDataRaw as Record<
+  string,
+  {
+    slug: string;
+    file: string;
+    title: string;
+    metaDescription: string;
+    keywords?: string;
+    canonical?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    twitterTitle?: string;
+    twitterDescription?: string;
+    twitterImage?: string;
+    html: string;
+    jsonLd?: string[];
+  }
+>;
+
+const page = pagesData["contact"];
 
 export const metadata: Metadata = {
-  title: "Contact SKS INFI | Financial Consultant & Loan Advisory in Jaipur",
+  title: page?.title || "SKS INFI Contact Number | Get Expert Financial Guidance Today",
   description:
-    "Get in touch with SKS INFI in Jaipur for expert financial consultation, home loans, MSME government subsidies, mutual funds and 24/7 NRI advisory services. Call +91 99285 29222.",
+    page?.metaDescription ||
+    "Contact SKS INFI in Jaipur for expert financial consultation, loans, investments, insurance and NRI financial services.",
   keywords: [
     "SKS INFI Contact Number",
+    "Financial Solutions Provider in Jaipur",
     "Financial Consultant in Jaipur",
-    "Loan Advisory Jaipur",
-    "MSME Subsidy Consultant Jaipur",
-    "Sunny Trade Centre Mansarovar Jaipur",
-    "NRI Financial Desk Jaipur",
-    "CA Aarun Jain Contact"
+    "Contact SKS INFI"
   ],
   alternates: {
-    canonical: "https://www.sksinfi.com/contact"
+    canonical: "https://www.sksinfi.com/contact.php"
   },
   openGraph: {
-    title: "Contact SKS INFI | Trusted Financial Advisory & Loans in Jaipur",
+    title: page?.ogTitle || page?.title || "SKS INFI Contact Number | Get Expert Financial Guidance Today",
     description:
-      "Connect with CA Aarun Jain and the SKS INFI senior advisory panel. 12+ nationwide branches, ₹85+ Cr loan facilitation track record.",
-    url: "https://www.sksinfi.com/contact",
+      page?.ogDescription ||
+      page?.metaDescription ||
+      "Contact SKS INFI in Jaipur for expert financial consultation, loans, investments, insurance and NRI financial services.",
+    url: "https://www.sksinfi.com/contact.php",
     siteName: "SKS INFI",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "https://www.sksinfi.com/img/aboutus.png",
-        width: 1200,
-        height: 630,
+        url: page?.ogImage || "https://www.sksinfi.com/img/aboutus.png",
         alt: "Contact SKS INFI Jaipur"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact SKS INFI | Trusted Financial Advisory in Jaipur",
-    description: "Get in touch for home loans, MSME subsidies, and wealth advisory. Call +91 99285 29222.",
-    images: ["https://www.sksinfi.com/img/aboutus.png"]
+    title: page?.twitterTitle || page?.title || "SKS INFI Contact Number | Get Expert Financial Guidance Today",
+    description:
+      page?.twitterDescription ||
+      page?.metaDescription ||
+      "Contact SKS INFI in Jaipur for expert financial consultation, loans, investments, insurance and NRI financial services.",
+    images: [page?.twitterImage || "https://www.sksinfi.com/img/aboutus.png"]
   }
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FinancialService",
-  name: "SKS INFI",
-  description: "Premier financial consultancy, loan DSA, MSME subsidy advisory and wealth management firm.",
-  url: "https://www.sksinfi.com/contact",
-  telephone: "+91-99285-29222",
-  email: "infi@sksinfi.com",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "520, 5th Floor, Sunny Trade Centre, New Aatish Market, Mansarovar",
-    addressLocality: "Jaipur",
-    addressRegion: "Rajasthan",
-    postalCode: "302020",
-    addressCountry: "IN"
-  },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 26.87697977666848,
-    longitude: 75.7583884754382
-  },
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      opens: "09:30",
-      closes: "19:30"
-    }
-  ],
-  priceRange: "₹₹"
-};
-
 export default function ContactPage() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <ContactClient />
-    </>
-  );
+  return <LegacyPageRenderer slug="contact" initialData={page} />;
 }
