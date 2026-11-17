@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { BlogPost, getAllCategories } from "@/data/blogsData";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 interface BlogFormState {
   title: string;
@@ -97,9 +98,10 @@ export default function AdminPage() {
       }
       document.execCommand(command, false, value);
       if (editorRef.current) {
+        const currentHtml = editorRef.current.innerHTML;
         setBlogForm((prev) => ({
           ...prev,
-          content: editorRef.current?.innerHTML || ""
+          content: currentHtml
         }));
       }
     }
@@ -218,9 +220,10 @@ export default function AdminPage() {
         } else {
           document.execCommand("insertHTML", false, formatted);
         }
+        const currentHtml = editorRef.current.innerHTML;
         setBlogForm((prev) => ({
           ...prev,
-          content: editorRef.current?.innerHTML || ""
+          content: currentHtml
         }));
         setNotification({
           type: "success",
@@ -1465,11 +1468,65 @@ export default function AdminPage() {
       {/* ADD / EDIT BLOG ARTICLE MODAL                                        */}
       {/* ==================================================================== */}
       {showBlogModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.65)",
+        <ErrorBoundary
+          fallback={
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(15, 23, 42, 0.65)",
+                zIndex: 99999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px"
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#ffffff",
+                  borderRadius: "16px",
+                  padding: "32px",
+                  maxWidth: "480px",
+                  width: "100%",
+                  textAlign: "center",
+                  boxShadow: "0 20px 40px -15px rgba(0, 0, 0, 0.2)"
+                }}
+              >
+                <div style={{ width: "50px", height: "50px", borderRadius: "50%", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                  <i className="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <h3 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", marginBottom: "8px" }}>
+                  Editor encountered an issue
+                </h3>
+                <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
+                  The editor recovered safely. You can reopen it or paste your article content directly.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowBlogModal(false)}
+                  style={{
+                    padding: "10px 24px",
+                    backgroundColor: "#094b57",
+                    color: "#ffffff",
+                    borderRadius: "10px",
+                    border: "none",
+                    fontWeight: "700",
+                    fontSize: "13px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Close Modal
+                </button>
+              </div>
+            </div>
+          }
+        >
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              backgroundColor: "rgba(15, 23, 42, 0.65)",
             zIndex: 99999,
             display: "flex",
             alignItems: "center",
@@ -1899,7 +1956,13 @@ export default function AdminPage() {
 
                         <button
                           type="button"
-                          onClick={() => setEditorMode(editorMode === "rich" ? "html" : "rich")}
+                          onClick={() => {
+                            if (editorMode === "rich" && editorRef.current) {
+                              const html = editorRef.current.innerHTML;
+                              setBlogForm((prev) => ({ ...prev, content: html }));
+                            }
+                            setEditorMode(editorMode === "rich" ? "html" : "rich");
+                          }}
                           style={{
                             background: "none",
                             border: "none",
@@ -1923,9 +1986,10 @@ export default function AdminPage() {
                           tabIndex={0}
                           onPaste={handleEditorPaste}
                           onInput={(e) => {
+                            const html = e.currentTarget.innerHTML;
                             setBlogForm((prev) => ({
                               ...prev,
-                              content: e.currentTarget.innerHTML
+                              content: html
                             }));
                           }}
                           style={{
@@ -2170,7 +2234,13 @@ export default function AdminPage() {
             >
               <button
                 type="button"
-                onClick={() => setBlogModalTab(blogModalTab === "edit" ? "preview" : "edit")}
+                onClick={() => {
+                  if (blogModalTab === "edit" && editorRef.current && editorMode === "rich") {
+                    const html = editorRef.current.innerHTML;
+                    setBlogForm((prev) => ({ ...prev, content: html }));
+                  }
+                  setBlogModalTab(blogModalTab === "edit" ? "preview" : "edit");
+                }}
                 style={{
                   background: "none",
                   border: "none",
@@ -2242,6 +2312,7 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+        </ErrorBoundary>
       )}
 
       {/* ==================================================================== */}
