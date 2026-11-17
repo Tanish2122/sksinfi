@@ -2702,21 +2702,48 @@ html {
   overflow: hidden;
   position: relative;
   width: 100%;
+  transition: height 0.35s ease;
 }
 .testimonial-track {
   display: flex;
+  align-items: flex-start !important;
   transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
 .testimonial-slide-item {
   flex: 0 0 100%;
   min-width: 100%;
+  align-self: flex-start !important;
 }
 @media (min-width: 992px) {
   .testimonial-slide-item {
     flex: 0 0 calc(50% - 12px);
     min-width: calc(50% - 12px);
+    align-self: flex-start !important;
   }
+}
+.testimonial-slide-item .review-card {
+  height: auto !important;
+  min-height: auto !important;
+}
+.testimonial-slide-item p.flex-grow-1 {
+  flex-grow: 0 !important;
+  margin-bottom: 1rem !important;
+}
+.testimonial-slide-item .mt-auto {
+  margin-top: 1rem !important;
+}
+.testimonial-long-scroll {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.testimonial-long-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.testimonial-long-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 .testimonial-dot {
   width: 10px;

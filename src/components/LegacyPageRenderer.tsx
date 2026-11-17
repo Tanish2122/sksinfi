@@ -852,6 +852,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
     // 5. Initialize Divi hero slider if present
     const sliderContainers = document.querySelectorAll(".et_pb_slides");
     const sliderTimers: NodeJS.Timeout[] = [];
+    const cleanupFns: (() => void)[] = [];
     sliderContainers.forEach((container) => {
       const slides = Array.from(container.querySelectorAll(".et_pb_slide")) as HTMLElement[];
       if (slides.length <= 1) return;
@@ -927,6 +928,18 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
         testimonialTrack.style.transition = animate ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)" : "none";
         testimonialTrack.style.transform = `translateX(-${offset}px)`;
 
+        // Dynamically adjust wrapper height to fit the currently visible slide(s) perfectly with no excess whitespace
+        const activeSlides = slides.slice(currentIndex, currentIndex + visible);
+        if (activeSlides.length > 0) {
+          const maxH = Math.max(...activeSlides.map((s) => {
+            const card = s.querySelector(".card") as HTMLElement | null;
+            return card ? card.offsetHeight : s.offsetHeight;
+          }));
+          if (maxH > 0 && testimonialTrack.parentElement) {
+            testimonialTrack.parentElement.style.height = `${maxH + 16}px`;
+          }
+        }
+
         const activeDotIdx = visible === 2
           ? (currentIndex >= maxIndex ? Math.ceil(maxIndex / 2) : Math.floor(currentIndex / 2))
           : currentIndex;
@@ -999,6 +1012,11 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       const handleResize = () => updateSlider(false);
       window.addEventListener("resize", handleResize);
 
+      // Initialize slider position & height immediately and after layout settles
+      updateSlider(false);
+      const initTimer = setTimeout(() => updateSlider(false), 150);
+      sliderTimers.push(initTimer);
+
       // Auto rotation every 7 seconds, pauses on hover
       const autoInterval = setInterval(goNext, 7000);
       sliderTimers.push(autoInterval);
@@ -1007,13 +1025,21 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       if (wrapper) {
         wrapper.addEventListener("mouseenter", () => clearInterval(autoInterval));
       }
+
+      cleanupFns.push(() => {
+        window.removeEventListener("resize", handleResize);
+      });
     }
 
     return () => {
       if (chartInstance) {
         chartInstance.destroy();
       }
-      sliderTimers.forEach(clearInterval);
+      sliderTimers.forEach((t) => {
+        clearInterval(t);
+        clearTimeout(t);
+      });
+      cleanupFns.forEach((fn) => fn());
     };
   }, [cleanHtml, slug]);
 
