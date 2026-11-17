@@ -278,13 +278,11 @@ export default function AdminPage() {
         // Add custom locally created/edited blogs
         for (const cb of customBlogs) {
           const cleanCbSlug = cb.slug.toLowerCase().trim();
-          if (!deletedSlugs.includes(cleanCbSlug)) {
-            const existingIdx = merged.findIndex((b) => b.slug.toLowerCase().trim() === cleanCbSlug);
-            if (existingIdx >= 0) {
-              merged[existingIdx] = cb;
-            } else {
-              merged.unshift(cb);
-            }
+          const existingIdx = merged.findIndex((b) => b.slug.toLowerCase().trim() === cleanCbSlug);
+          if (existingIdx >= 0) {
+            merged[existingIdx] = cb;
+          } else {
+            merged.unshift(cb);
           }
         }
         setBlogs(merged);

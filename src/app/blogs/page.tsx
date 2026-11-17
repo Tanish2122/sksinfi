@@ -68,15 +68,13 @@ function BlogsContent() {
 
           for (const cb of customBlogs) {
             const cleanCbSlug = cb.slug.toLowerCase().trim();
-            if (!deletedSlugs.includes(cleanCbSlug)) {
-              const existingIdx = updated.findIndex(
-                (b) => b.slug.toLowerCase().trim() === cleanCbSlug
-              );
-              if (existingIdx >= 0) {
-                updated[existingIdx] = cb;
-              } else {
-                updated.unshift(cb);
-              }
+            const existingIdx = updated.findIndex(
+              (b) => b.slug.toLowerCase().trim() === cleanCbSlug
+            );
+            if (existingIdx >= 0) {
+              updated[existingIdx] = cb;
+            } else {
+              updated.unshift(cb);
             }
           }
           setBlogsList(updated);

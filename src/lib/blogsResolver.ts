@@ -63,8 +63,7 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
         const found = tmpBlogs.find(
           (b) =>
             b.slug.toLowerCase().trim() === clean ||
-            b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "") ||
-            b.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === clean
+            b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "")
         );
         if (found) return found;
       }
@@ -81,8 +80,7 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
         const found = diskBlogs.find(
           (b) =>
             b.slug.toLowerCase().trim() === clean ||
-            b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "") ||
-            b.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === clean
+            b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "")
         );
         if (found) return found;
       }
@@ -96,8 +94,7 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
   return BLOGS_DATA.find(
     (b) =>
       b.slug.toLowerCase().trim() === clean ||
-      b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "") ||
-      b.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === clean
+      b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "")
   );
 }
 

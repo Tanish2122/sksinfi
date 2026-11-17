@@ -38,11 +38,13 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
   const [isDeleted, setIsDeleted] = useState(false);
   const articleRef = useRef<HTMLDivElement>(null);
 
-  // Check client-side localStorage if not found on server
+  // Check client-side localStorage and API if not found on server
   useEffect(() => {
     if (!initialPost && typeof window !== "undefined") {
+      const cleanTargetSlug = (slug || "").toLowerCase().trim();
+
+      // 1. Check custom blogs in localStorage
       try {
-        const cleanTargetSlug = (slug || "").toLowerCase().trim();
         const customBlogs: BlogPost[] = JSON.parse(
           localStorage.getItem("sks_custom_blogs") || "[]"
         );
@@ -55,12 +57,34 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
         if (found) {
           setPost(found);
           setModalCategory(found.category);
+          setIsDeleted(false);
+          setLoading(false);
+          return;
         }
       } catch (e) {
         console.warn("Failed checking localStorage for blog post:", e);
-      } finally {
-        setLoading(false);
       }
+
+      // 2. Query /api/admin/blogs for dynamically published articles across sessions
+      fetch("/api/admin/blogs", { cache: "no-store" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((blogs: BlogPost[]) => {
+          if (Array.isArray(blogs)) {
+            const found = blogs.find(
+              (b) =>
+                b.slug.toLowerCase().trim() === cleanTargetSlug ||
+                b.slug.toLowerCase().trim().replace(/-/g, "") === cleanTargetSlug.replace(/-/g, "") ||
+                b.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === cleanTargetSlug
+            );
+            if (found) {
+              setPost(found);
+              setModalCategory(found.category);
+              setIsDeleted(false);
+            }
+          }
+        })
+        .catch((e) => console.warn("API blogs fetch error:", e))
+        .finally(() => setLoading(false));
     }
   }, [initialPost, slug]);
 
@@ -68,11 +92,32 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
   useEffect(() => {
     if (post && typeof window !== "undefined") {
       try {
+        const cleanSlug = post.slug.toLowerCase().trim();
+        const customBlogs: BlogPost[] = JSON.parse(
+          localStorage.getItem("sks_custom_blogs") || "[]"
+        );
+        // If this blog is in customBlogs, it is active and cannot be considered deleted
+        const isCustom = customBlogs.some((b) => b.slug.toLowerCase().trim() === cleanSlug);
+        if (isCustom) {
+          setIsDeleted(false);
+          // Heal stale deleted slugs in localStorage
+          const deletedSlugs: string[] = JSON.parse(
+            localStorage.getItem("sks_deleted_blog_slugs") || "[]"
+          );
+          if (deletedSlugs.includes(cleanSlug)) {
+            const cleaned = deletedSlugs.filter((s) => s.toLowerCase().trim() !== cleanSlug);
+            localStorage.setItem("sks_deleted_blog_slugs", JSON.stringify(cleaned));
+          }
+          return;
+        }
+
         const deletedSlugs: string[] = JSON.parse(
           localStorage.getItem("sks_deleted_blog_slugs") || "[]"
         );
-        if (deletedSlugs.includes(post.slug.toLowerCase().trim())) {
+        if (deletedSlugs.includes(cleanSlug)) {
           setIsDeleted(true);
+        } else {
+          setIsDeleted(false);
         }
       } catch {}
     }
