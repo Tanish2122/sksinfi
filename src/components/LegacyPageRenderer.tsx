@@ -763,7 +763,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
                 phone: phone || "Not provided",
                 email: email || "Not provided",
                 service: serviceDisplay,
-                location: `${city ? `${city}, ` : ""}${country}`,
+                location: `${address ? `${address}, ` : ""}${city ? `${city}, ` : ""}${country}`,
                 message: message || (isPartner ? "Partnership Proposal Request" : "General Consultation Request")
               })
             }).catch((w3Err) => console.warn("Web3Forms client dispatch notice:", w3Err));
@@ -818,7 +818,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
                 <div class="fw-bold fs-6 mb-1 d-flex align-items-center justify-content-center gap-1">
                   <span>✓ ${isPartner ? "Partnership Request Submitted Successfully!" : "Enquiry Submitted Successfully!"}</span>
                 </div>
-                <div class="small" style="color: #047857;">Thank you, <b>${name || (isPartner ? "Partner" : "Valued Client")}</b>. ${isPartner ? "Our executive desk will review your proposal and get in touch with you shortly." : "Our senior financial consultant will call you within 30 minutes."}</div>
+                <div class="small" style="color: #047857;">Thank you, <b>${name || (isPartner ? "Partner" : "Valued Client")}</b>. ${isPartner ? "Our executive desk will review your proposal and get in touch with you shortly." : "Your enquiry has been emailed to our advisory desk. Our senior consultant will connect with you within 15–30 minutes."}</div>
               </div>
             `;
             feedbackEl.style.display = "block";
