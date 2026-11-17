@@ -2733,18 +2733,6 @@ html {
 .testimonial-slide-item .mt-auto {
   margin-top: 1rem !important;
 }
-.testimonial-long-scroll {
-  max-height: 220px;
-  overflow-y: auto;
-  padding-right: 6px;
-}
-.testimonial-long-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-.testimonial-long-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
 .testimonial-dot {
   width: 10px;
   height: 10px;
