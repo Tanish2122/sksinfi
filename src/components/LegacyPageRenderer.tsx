@@ -783,7 +783,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
                 service: chosenService,
                 subService: chosenSubService,
                 country,
-                city: city || address,
+                city: city || address || country,
                 message,
               }),
             }).catch((err) => console.warn("SMS notification fetch error:", err));
@@ -803,7 +803,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
                 service: chosenService,
                 subService: chosenSubService,
                 country,
-                city: city || address,
+                city: city || address || country,
                 message: message || (isPartner ? "Partnership Proposal Request" : ""),
               }),
             }).catch((err) => console.warn("Email notification dispatch error:", err));
