@@ -70,16 +70,29 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
   const jsonLd = initialData?.jsonLd || [];
 
   useEffect(() => {
-    // Handle initial hash scrolling (e.g. /#why-sks-infi)
-    if (typeof window !== "undefined" && window.location.hash) {
-      setTimeout(() => {
-        try {
-          const hashEl = document.querySelector(window.location.hash);
-          if (hashEl) {
-            hashEl.scrollIntoView({ behavior: "smooth" });
-          }
-        } catch (_) {}
-      }, 300);
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+
+      // If page was loaded/refreshed with #features or #hero, clear the hash and always start at the very top
+      if (window.location.hash === "#features" || window.location.hash === "#hero") {
+        history.replaceState(null, "", window.location.pathname);
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        return;
+      }
+
+      // Handle targeted section anchor scrolling (e.g. /#why-sks-infi)
+      if (window.location.hash) {
+        setTimeout(() => {
+          try {
+            const hashEl = document.querySelector(window.location.hash);
+            if (hashEl) {
+              hashEl.scrollIntoView({ behavior: "smooth" });
+            }
+          } catch (_) {}
+        }, 300);
+      }
     }
 
     // 0. FAQ Accordion Interactive Toggler (fallback only if Bootstrap is not loaded)

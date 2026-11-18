@@ -147,6 +147,23 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(globalSchema) }}
         />
+
+        {/* Prevent automatic jump to #features on page load / refresh */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (window.location.hash === '#features' || window.location.hash === '#hero') {
+                  history.replaceState(null, '', window.location.pathname);
+                  window.scrollTo(0, 0);
+                }
+                if ('scrollRestoration' in history) {
+                  history.scrollRestoration = 'manual';
+                }
+              } catch (e) {}
+            `
+          }}
+        />
       </head>
       <body className="antialiased min-h-screen text-[#333333] bg-white font-['Poppins',sans-serif]" suppressHydrationWarning>
         {children}
