@@ -1030,15 +1030,6 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       const initTimer = setTimeout(() => updateSlider(false), 150);
       sliderTimers.push(initTimer);
 
-      // Auto rotation every 7 seconds, pauses on hover
-      const autoInterval = setInterval(goNext, 7000);
-      sliderTimers.push(autoInterval);
-
-      const wrapper = testimonialTrack.closest(".testimonial-slider-wrapper") as HTMLElement | null;
-      if (wrapper) {
-        wrapper.addEventListener("mouseenter", () => clearInterval(autoInterval));
-      }
-
       cleanupFns.push(() => {
         window.removeEventListener("resize", handleResize);
       });
