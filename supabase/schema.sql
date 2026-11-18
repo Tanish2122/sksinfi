@@ -3,12 +3,12 @@
 -- Execute this script in your Supabase SQL Editor (https://supabase.com/dashboard)
 -- ==============================================================================
 
--- Enable UUID extension
+-- Enable UUID extension (built-in gen_random_uuid() or uuid-ossp)
 create extension if not exists "uuid-ossp";
 
 -- 1. Contact Form Inquiries
 create table if not exists public.contact_enquiries (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null,
   phone text not null,
@@ -21,7 +21,7 @@ create table if not exists public.contact_enquiries (
 
 -- 2. Loan & Investment Specific Inquiries
 create table if not exists public.loan_enquiries (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   email text,
   phone text not null,
@@ -36,7 +36,7 @@ create table if not exists public.loan_enquiries (
 
 -- 3. Partner With Us (DSA / Referral Partners)
 create table if not exists public.partner_enquiries (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null,
   mobile text not null,
@@ -51,7 +51,7 @@ create table if not exists public.partner_enquiries (
 
 -- 4. Career Applications
 create table if not exists public.career_applications (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null,
   mobile text not null,
@@ -67,7 +67,7 @@ create table if not exists public.career_applications (
 
 -- 5. Dynamic Site Banners & Notifications
 create table if not exists public.site_banners (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   title text not null,
   image_url text not null,
   target_url text,
@@ -78,7 +78,7 @@ create table if not exists public.site_banners (
 
 -- 6. Dynamic Financial Blogs & Articles
 create table if not exists public.blogs (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   slug text unique not null,
   title text not null,
   excerpt text not null,
@@ -106,41 +106,52 @@ alter table public.site_banners enable row level security;
 alter table public.blogs enable row level security;
 
 -- Anonymous public users can INSERT submissions (frontend lead forms)
+drop policy if exists "Allow anonymous inserts into contact_enquiries" on public.contact_enquiries;
 create policy "Allow anonymous inserts into contact_enquiries"
   on public.contact_enquiries for insert with check (true);
 
+drop policy if exists "Allow anonymous inserts into loan_enquiries" on public.loan_enquiries;
 create policy "Allow anonymous inserts into loan_enquiries"
   on public.loan_enquiries for insert with check (true);
 
+drop policy if exists "Allow anonymous inserts into partner_enquiries" on public.partner_enquiries;
 create policy "Allow anonymous inserts into partner_enquiries"
   on public.partner_enquiries for insert with check (true);
 
+drop policy if exists "Allow anonymous inserts into career_applications" on public.career_applications;
 create policy "Allow anonymous inserts into career_applications"
   on public.career_applications for insert with check (true);
 
 -- Anonymous public users can read active banners and published blogs
+drop policy if exists "Allow anonymous read active site_banners" on public.site_banners;
 create policy "Allow anonymous read active site_banners"
   on public.site_banners for select using (is_active = true);
 
+drop policy if exists "Allow anonymous read published blogs" on public.blogs;
 create policy "Allow anonymous read published blogs"
   on public.blogs for select using (is_published = true);
 
 -- Authenticated Admin users can select, update, and delete all records
+drop policy if exists "Allow authenticated admin full access to contact_enquiries" on public.contact_enquiries;
 create policy "Allow authenticated admin full access to contact_enquiries"
   on public.contact_enquiries for all using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated admin full access to loan_enquiries" on public.loan_enquiries;
 create policy "Allow authenticated admin full access to loan_enquiries"
   on public.loan_enquiries for all using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated admin full access to partner_enquiries" on public.partner_enquiries;
 create policy "Allow authenticated admin full access to partner_enquiries"
   on public.partner_enquiries for all using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated admin full access to career_applications" on public.career_applications;
 create policy "Allow authenticated admin full access to career_applications"
   on public.career_applications for all using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated admin full access to site_banners" on public.site_banners;
 create policy "Allow authenticated admin full access to site_banners"
   on public.site_banners for all using (auth.role() = 'authenticated');
 
+drop policy if exists "Allow authenticated admin full access to blogs" on public.blogs;
 create policy "Allow authenticated admin full access to blogs"
   on public.blogs for all using (auth.role() = 'authenticated');
-
