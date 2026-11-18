@@ -1814,6 +1814,16 @@ export default function AdminPage() {
                           H<sub style={{ fontSize: "9px" }}>3</sub>
                         </button>
 
+                        {/* Paragraph */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('formatBlock', '<p>')}
+                          title="Paragraph / Normal Text (P)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                        >
+                          P
+                        </button>
+
                         <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
 
                         {/* Align Left */}
