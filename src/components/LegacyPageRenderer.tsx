@@ -367,7 +367,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
 
                       <div class="pt-2 border-top border-light mt-auto d-flex align-items-center justify-content-between">
                         <a href="/blogs/${post.slug}" class="btn btn-sm fw-bold text-white px-3.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5" style="background: #b69455; font-size: 12px; text-decoration: none;">
-                          Read Article <i class="fa fa-arrow-right" style="font-size: 10px;"></i>
+                          Read Blog <i class="fa fa-arrow-right" style="font-size: 10px;"></i>
                         </a>
                         <span class="text-muted small" style="font-size: 11.5px;">By ${post.author?.name || 'SKS INFI'}</span>
                       </div>

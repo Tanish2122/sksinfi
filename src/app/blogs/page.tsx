@@ -415,14 +415,14 @@ function BlogsContent() {
                           </div>
                         </div>
 
-                        {/* Read Full Article CTA positioned at the RIGHT EDGE of content column */}
+                        {/* Read Full Blog CTA positioned at the RIGHT EDGE of content column */}
                         <div className="sm:ml-auto w-full sm:w-auto flex sm:justify-end">
                           <Link
                             href={`/blogs/${featuredPost.slug}`}
                             className="h-[46px] sm:h-[48px] px-5 sm:px-6 inline-flex items-center justify-center gap-2 border-2 border-[#094b57] text-[#094b57] bg-transparent hover:bg-[#094b57] hover:text-white rounded-full font-semibold text-xs sm:text-sm transition-all duration-300 shadow-xs hover:shadow-md group w-full sm:w-auto"
                             style={{ textDecoration: "none" }}
                           >
-                            <span>Read Full Article</span>
+                            <span>Read Full Blog</span>
                             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                           </Link>
                         </div>
@@ -451,7 +451,7 @@ function BlogsContent() {
                     className="text-2xl md:text-3xl font-bold"
                   >
                     {selectedCategory === "All"
-                      ? "All Financial Articles"
+                      ? "All Financial Blogs"
                       : `${selectedCategory} Insights`}
                   </h2>
                   <p className="text-xs md:text-sm text-gray-500 mt-1">

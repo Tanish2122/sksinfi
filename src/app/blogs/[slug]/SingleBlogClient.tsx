@@ -170,7 +170,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
             <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <HelpCircle className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 mb-2">Article Removed</h1>
+            <h1 className="text-2xl font-bold text-slate-800 mb-2">Blog Removed</h1>
             <p className="text-slate-500 text-sm mb-6">
               This blog article has been removed from SKS INFI.
             </p>
@@ -198,7 +198,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
               <HelpCircle className="w-8 h-8" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
-              Article Not Found or Moved
+              Blog Not Found or Moved
             </h1>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
               The requested advisory article <code className="bg-slate-100 px-2 py-0.5 rounded text-slate-800 text-xs font-mono">{slug || "article"}</code> could not be found. It may have been updated, renamed, or relocated.
@@ -210,7 +210,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                 className="inline-flex items-center justify-center gap-2 hover:bg-[#073942] px-6 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Explore All Articles</span>
+                <span>Explore All Blogs</span>
               </Link>
               <Link
                 href="/"
@@ -225,7 +225,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
           {relatedPosts && relatedPosts.length > 0 && (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">
-                Popular Financial Advisory Articles
+                Popular Financial Advisory Blogs
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {relatedPosts.map((rel) => (
@@ -441,7 +441,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                           cursor: "pointer"
                         }}
                         className="hover:bg-white/20 transition"
-                        title="Copy Article Link"
+                        title="Copy Blog Link"
                       >
                         {copied ? (
                           <Check className="w-3.5 h-3.5 text-emerald-300" />
@@ -724,7 +724,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                       href="/blogs"
                       className="text-xs md:text-sm font-semibold text-[#094b57] hover:text-[#b69455] flex items-center gap-1 transition"
                     >
-                      <span>View All Articles</span>
+                      <span>View All Blogs</span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>

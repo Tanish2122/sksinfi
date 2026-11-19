@@ -89,7 +89,7 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 bg-[#094b57] hover:bg-[#073942] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm no-underline"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Explore All Financial Articles</span>
+            <span>Explore All Financial Blogs</span>
           </Link>
         </div>
       </main>
