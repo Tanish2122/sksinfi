@@ -591,8 +591,11 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
 
     // 3. Initialize SIP Calculator if present
     const monthlyInvEl = document.getElementById("monthly_investment") as HTMLInputElement | null;
+    const monthlyInvSlider = document.getElementById("monthly_investment_slider") as HTMLInputElement | null;
     const periodEl = document.getElementById("investment_period") as HTMLInputElement | null;
+    const periodSlider = document.getElementById("investment_period_slider") as HTMLInputElement | null;
     const returnEl = document.getElementById("expected_return") as HTMLInputElement | null;
+    const returnSlider = document.getElementById("expected_return_slider") as HTMLInputElement | null;
     const sipBtn = document.getElementById("calculateButton");
     const futureValEl = document.getElementById("future_value");
     const totalInvEl = document.getElementById("total_investment");
@@ -643,11 +646,36 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
       }
     }
 
+    function syncSip(slider: HTMLInputElement | null, numInput: HTMLInputElement | null) {
+      if (!slider || !numInput) return;
+      slider.addEventListener("input", () => {
+        numInput.value = slider.value;
+        calculateSIP();
+      });
+      numInput.addEventListener("input", () => {
+        const val = parseFloat(numInput.value);
+        if (!isNaN(val)) {
+          slider.value = String(val);
+        }
+        calculateSIP();
+      });
+      numInput.addEventListener("change", () => {
+        const val = parseFloat(numInput.value);
+        if (!isNaN(val)) {
+          slider.value = String(val);
+        }
+        calculateSIP();
+      });
+    }
+
     if (monthlyInvEl && periodEl && returnEl) {
       [monthlyInvEl, periodEl, returnEl].forEach((input) => {
         input.addEventListener("input", calculateSIP);
         input.addEventListener("change", calculateSIP);
       });
+      syncSip(monthlyInvSlider, monthlyInvEl);
+      syncSip(returnSlider, returnEl);
+      syncSip(periodSlider, periodEl);
       calculateSIP();
     }
 
