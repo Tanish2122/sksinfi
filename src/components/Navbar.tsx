@@ -136,8 +136,8 @@ const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "Accounts", href: "/accounts" },
       { label: "Taxation", href: "/taxation" },
-      { label: "GST", href: "/gst" },
-      { label: "ITR", href: "/itr" },
+      { label: "GST Registration", href: "/gst" },
+      { label: "ITR & Audit", href: "/itr" },
       { label: "Litigation", href: "/litigation" }
     ]
   },
