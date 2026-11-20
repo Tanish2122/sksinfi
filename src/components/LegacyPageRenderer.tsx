@@ -1077,7 +1077,7 @@ export default function LegacyPageRenderer({ slug, initialData }: LegacyPageRend
 
   return (
     <>
-      {jsonLd.map((schemaStr, idx) => (
+      {(Array.isArray(jsonLd) ? jsonLd : (jsonLd ? [typeof jsonLd === "string" ? jsonLd : JSON.stringify(jsonLd)] : [])).map((schemaStr, idx) => (
         <script
           key={`ld-json-${idx}`}
           type="application/ld+json"

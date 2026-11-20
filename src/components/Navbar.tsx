@@ -21,6 +21,7 @@ interface NavItem {
   href: string;
   columns?: number;
   dropdownWidth?: string;
+  dropdownAlign?: "left" | "right";
   bannerBadge?: string;
   subtitle?: string;
   children?: { label: string; href: string }[];
@@ -140,13 +141,20 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Tax & Compliances",
     href: "/accountstax",
-    subtitle: "Tax Planning, GST & Audit Support",
+    columns: 2,
+    dropdownWidth: "525px",
+    dropdownAlign: "right",
+    subtitle: "Tax Planning, Corporate Setup & Compliances",
     children: [
       { label: "Accounts", href: "/accounts" },
       { label: "Taxation", href: "/taxation" },
       { label: "GST Registration", href: "/gst" },
       { label: "ITR & Audit", href: "/itr" },
-      { label: "Litigation", href: "/litigation" }
+      { label: "Litigation", href: "/litigation" },
+      { label: "Firm & Company Set-up", href: "/firm-company-setup" },
+      { label: "Statutory Compliances", href: "/statutory-compliances" },
+      { label: "Insolvency Audit", href: "/insolvency-audit" },
+      { label: "Insolvency Compliances", href: "/insolvency-compliances" }
     ]
   },
   {
@@ -653,7 +661,8 @@ export default function Navbar({ onOpenEnquiry }: NavbarProps = {}) {
                         style={{
                           position: "absolute",
                           top: "100%",
-                          left: isTwoCols ? "-60px" : "-10px",
+                          left: item.dropdownAlign === "right" ? "auto" : (isTwoCols ? "-60px" : "-10px"),
+                          right: item.dropdownAlign === "right" ? "-15px" : "auto",
                           paddingTop: "6px",
                           zIndex: 9999
                         }}
