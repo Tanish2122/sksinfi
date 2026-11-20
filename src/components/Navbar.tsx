@@ -121,15 +121,20 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "INSURANCE",
     href: "/insurance",
+    columns: 2,
+    dropdownWidth: "525px",
     subtitle: "Comprehensive Risk Protection",
     children: [
       { label: "Why Insurance", href: "/why_insurance" },
       { label: "Health Insurance", href: "/health" },
       { label: "Life Insurance", href: "/life" },
       { label: "Term Insurance", href: "/term" },
-      { label: "Property Insurance", href: "/property" },
       { label: "Travel Insurance", href: "/travel" },
-      { label: "Factory Insurance", href: "/factory" }
+      { label: "General Insurance", href: "/general-insurance" },
+      { label: "Factory Insurance", href: "/factory" },
+      { label: "Property Insurance", href: "/property" },
+      { label: "Stock Insurance", href: "/stock-insurance" },
+      { label: "Workmen Insurance", href: "/workmen-insurance" }
     ]
   },
   {

@@ -188,11 +188,12 @@ export const authenticFooterHtml = `<style>
           <li><a href="/why_insurance"><i class="fa fa-chevron-right"></i><span>Why Insurance</span></a></li>
           <li><a href="/health"><i class="fa fa-chevron-right"></i><span>Health Insurance</span></a></li>
           <li><a href="/life"><i class="fa fa-chevron-right"></i><span>Term &amp; Life Insurance</span></a></li>
-          <li><a href="/general"><i class="fa fa-chevron-right"></i><span>General Insurance</span></a></li>
+          <li><a href="/general-insurance"><i class="fa fa-chevron-right"></i><span>General Insurance</span></a></li>
           <li><a href="/factory"><i class="fa fa-chevron-right"></i><span>Factory Insurance</span></a></li>
           <li><a href="/property"><i class="fa fa-chevron-right"></i><span>Property Insurance</span></a></li>
-          <li><a href="/stock"><i class="fa fa-chevron-right"></i><span>Stock Insurance</span></a></li>
-          <li><a href="/general"><i class="fa fa-chevron-right"></i><span>Workmen Insurance</span></a></li>
+          <li><a href="/stock-insurance"><i class="fa fa-chevron-right"></i><span>Stock Insurance</span></a></li>
+          <li><a href="/workmen-insurance"><i class="fa fa-chevron-right"></i><span>Workmen Insurance</span></a></li>
+          <li><a href="/travel"><i class="fa fa-chevron-right"></i><span>Travel Insurance</span></a></li>
         </ul>
       </div>
 
