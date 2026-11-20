@@ -105,10 +105,12 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "INVESTMENT",
     href: "/investment",
+    dropdownWidth: "285px",
     subtitle: "Wealth Creation & Portfolio Management",
     children: [
       { label: "Why Investment", href: "/why_investment" },
       { label: "Mutual Fund & SIP", href: "/mutual_funds" },
+      { label: "Govt. Securities (G-Sec)", href: "/govt-securities" },
       { label: "Bonds & Debentures", href: "/bonds" },
       { label: "NCD", href: "/ncd" },
       { label: "Unlisted Shares", href: "/unlisted_shares" },
