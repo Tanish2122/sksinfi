@@ -134,7 +134,7 @@ export const authenticFooterHtml = `<style>
           <li><a href="/education"><i class="fa fa-chevron-right"></i><span>Education Loan</span></a></li>
           <li><a href="/commercial_vehicle"><i class="fa fa-chevron-right"></i><span>Commercial Vehicle Loan</span></a></li>
           <li><a href="/loan#commercial-equipment"><i class="fa fa-chevron-right"></i><span>Commercial Equipment Loan</span></a></li>
-          <li><a href="/project_finance"><i class="fa fa-chevron-right"></i><span>Machinery Loan</span></a></li>
+          <li><a href="/machinery-loan"><i class="fa fa-chevron-right"></i><span>Machinery Loan</span></a></li>
         </ul>
       </div>
 

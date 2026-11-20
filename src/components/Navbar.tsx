@@ -72,7 +72,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "LOAN",
     href: "/loan",
     columns: 2,
-    dropdownWidth: "500px",
+    dropdownWidth: "520px",
     subtitle: "Loan (Associated with 95+ Banks)",
     children: [
       { label: "SKSINFI & Loan", href: "/loan" },
@@ -80,6 +80,7 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Loan Against Property", href: "/lap" },
       { label: "Personal Loan", href: "/personal-loan" },
       { label: "Business Loan", href: "/business-loan" },
+      { label: "Machinery Loan", href: "/machinery-loan" },
       { label: "Education Loan", href: "/education" },
       { label: "New Car Loan", href: "/car" },
       { label: "Used Car Loan", href: "/car#used-car" },
