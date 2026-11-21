@@ -5,14 +5,14 @@
 :root {
   --primary-color: #094b57;
   --primary-dark: #06363f;
-  --secondary-color: #f9f0df;
+  --secondary-color: #ffffff;
   --accent-gold: #b69455;
   --accent-gold-light: #e9c787;
   --text-dark: #333333;
   --text-body: #374151;
   --text-muted: #4b5563;
-  --bg-warm: #f9f8f5;
-  --bg-cream: #f9f0df;
+  --bg-warm: #ffffff;
+  --bg-cream: #ffffff;
 
   /* Global Layout & Spacing Design Tokens */
   --container-width: 1240px;
@@ -831,9 +831,16 @@ a:hover {
 
 /* 3. WHY SKS INFI - Exact 5-Column Arch Cards */
 .fincom-section {
-  background-color: #f9f0df !important;
+  background-color: #ffffff !important;
   padding: 45px 0 !important;
   margin: 30px 0 !important;
+}
+
+/* Global Service & Loan Pages - Standardized Homepage White Background */
+section.stock,
+.stock {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
 }
 
 .fincom-section .et_pb_row_1 h2 {
