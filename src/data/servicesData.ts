@@ -234,7 +234,7 @@ export const servicesData: ServiceItem[] = [
       "Proforma invoice from authorized commercial dealership"
     ],
     icon: "Truck",
-    image: "/images/segments/commercial_vehicle.jpg"
+    image: "/img/loan_c/commercial_vehicle_loan.jpg?v=2"
   },
   {
     id: "commercial-equipment",
