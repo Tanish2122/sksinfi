@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "SKS INFI About Us"
   ],
   alternates: {
-    canonical: "https://www.sksinfi.com/about.php"
+    canonical: "https://www.sksinfi.com/about"
   },
   openGraph: {
     title: page?.ogTitle || page?.title || "Financial Consultancy in India | Trusted SKS INFI Experts",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
       page?.ogDescription ||
       page?.metaDescription ||
       "Choose SKS INFI as your Financial Service Provider in India for financial planning, investments, insurance, taxation and wealth management guidance now today.",
-    url: "https://www.sksinfi.com/about.php",
+    url: "https://www.sksinfi.com/about",
     siteName: "SKS INFI",
     locale: "en_US",
     type: "website",

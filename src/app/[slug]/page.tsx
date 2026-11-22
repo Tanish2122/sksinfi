@@ -118,6 +118,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function DynamicLegacyPage({ params }: PageProps) {
   const { slug } = await params;
   const cleanSlug = slug.replace(/\.php$/, "");
+  if (slug.endsWith(".php")) {
+    redirect(`/${cleanSlug}`);
+  }
 
   if (cleanSlug === "blog" || cleanSlug === "blogs") {
     redirect("/blogs");

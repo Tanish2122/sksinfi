@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "Contact SKS INFI"
   ],
   alternates: {
-    canonical: "https://www.sksinfi.com/contact.php"
+    canonical: "https://www.sksinfi.com/contact"
   },
   openGraph: {
     title: page?.ogTitle || page?.title || "SKS INFI Contact Number | Get Expert Financial Guidance Today",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
       page?.ogDescription ||
       page?.metaDescription ||
       "Contact SKS INFI in Jaipur for expert financial consultation, loans, investments, insurance and NRI financial services.",
-    url: "https://www.sksinfi.com/contact.php",
+    url: "https://www.sksinfi.com/contact",
     siteName: "SKS INFI",
     locale: "en_US",
     type: "website",

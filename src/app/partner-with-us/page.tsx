@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     "Financial Advisory Partner"
   ],
   alternates: {
-    canonical: "https://www.sksinfi.com/partner-with-us.php"
+    canonical: "https://www.sksinfi.com/partner-with-us"
   },
   openGraph: {
     title: page?.ogTitle || page?.title || "Partner With A SKS INFI | Financial Consultant in Jaipur",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
       page?.ogDescription ||
       page?.metaDescription ||
       "Partner with SKS INFI to grow your financial advisory or distribution business in Jaipur and across India.",
-    url: "https://www.sksinfi.com/partner-with-us.php",
+    url: "https://www.sksinfi.com/partner-with-us",
     siteName: "SKS INFI",
     locale: "en_US",
     type: "website",
