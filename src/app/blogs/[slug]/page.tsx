@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${post.title} | SKS INFI`,
     description: post.excerpt,
     keywords: post.tags,
-    authors: [{ name: post.author.name }],
+    authors: [{ name: "SKS INFI" }],
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: "article",
       publishedTime: post.publishedDate,
-      authors: [post.author.name],
+      authors: ["SKS INFI"],
       tags: post.tags,
       images: [
         {
@@ -81,9 +81,9 @@ export default async function SingleBlogPage({ params }: PageProps) {
         image: `https://www.sksinfi.com${post.coverImage}`,
         datePublished: post.publishedDate,
         author: {
-          "@type": "Person",
-          name: post.author.name,
-          jobTitle: post.author.role,
+          "@type": "Organization",
+          name: "SKS INFI",
+          url: "https://www.sksinfi.com",
         },
         publisher: {
           "@type": "Organization",

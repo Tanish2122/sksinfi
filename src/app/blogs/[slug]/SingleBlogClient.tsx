@@ -336,120 +336,72 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                   {post.title}
                 </h1>
 
-                {/* Author + Metadata row */}
+                {/* Metadata row */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 border-t border-white/15">
-                  <div className="flex items-center gap-3">
-                    <div
-                      style={{
-                        width: "44px",
-                        height: "44px",
-                        borderRadius: "50%",
-                        backgroundColor: "rgba(255, 255, 255, 0.15)",
-                        color: "#ffffff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "700",
-                        fontSize: "16px",
-                        flexShrink: 0,
-                        border: "2px solid rgba(255,255,255,0.3)"
-                      }}
-                    >
-                      {post.author.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p
-                          className="text-sm font-bold text-white leading-tight"
-                          style={{ color: "#ffffff", margin: 0 }}
-                        >
-                          {post.author.name}
-                        </p>
-                        <span className="text-[10px] bg-emerald-400/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-400/30">
-                          Verified
-                        </span>
-                      </div>
-                      <p
-                        className="text-xs mt-0.5"
-                        style={{
-                          color: "#e9c787",
-                          fontSize: "12px",
-                          lineHeight: "1.3",
-                          margin: "2px 0 0 0",
-                          fontWeight: 500
-                        }}
-                      >
-                        {post.author.role}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-white/70">
+                  <div className="flex items-center gap-3 text-xs sm:text-sm text-white/80">
                     <span className="flex items-center gap-1.5 font-medium">
                       <Calendar className="w-3.5 h-3.5 text-[#e9c787]" />
                       {post.publishedDate}
                     </span>
-                    <span className="text-white/40">•</span>
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <Clock className="w-3.5 h-3.5 text-[#e9c787]" />
-                      {post.readTime}
+                    <span className="text-white/30">•</span>
+                    <span className="bg-white/10 text-[#e9c787] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      {post.category}
                     </span>
-                    <span className="text-white/40">•</span>
+                  </div>
 
-                    {/* Social Share Buttons */}
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-white/50 font-semibold mr-1">Share:</span>
-                      <a
-                        href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-emerald-500 flex items-center justify-center transition border border-white/20"
-                        title="Share on WhatsApp"
-                      >
-                        <i className="fab fa-whatsapp text-sm"></i>
-                      </a>
-                      <a
-                        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-blue-600 flex items-center justify-center transition border border-white/20"
-                        title="Share on LinkedIn"
-                      >
-                        <i className="fab fa-linkedin-in text-sm"></i>
-                      </a>
-                      <a
-                        href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-gray-900 flex items-center justify-center transition border border-white/20"
-                        title="Share on X"
-                      >
-                        <i className="fa-brands fa-x-twitter text-sm"></i>
-                      </a>
-                      <button
-                        onClick={handleCopyLink}
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgba(255,255,255,0.1)",
-                          color: "rgba(255,255,255,0.8)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          cursor: "pointer"
-                        }}
-                        className="hover:bg-white/20 transition"
-                        title="Copy Blog Link"
-                      >
-                        {copied ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-                    </div>
+                  {/* Social Share Buttons */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white/50 font-semibold mr-1 text-xs">Share:</span>
+                    <a
+                      href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-emerald-500 flex items-center justify-center transition border border-white/20"
+                      title="Share on WhatsApp"
+                    >
+                      <i className="fab fa-whatsapp text-sm"></i>
+                    </a>
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-blue-600 flex items-center justify-center transition border border-white/20"
+                      title="Share on LinkedIn"
+                    >
+                      <i className="fab fa-linkedin-in text-sm"></i>
+                    </a>
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-white/10 text-white hover:bg-gray-900 flex items-center justify-center transition border border-white/20"
+                      title="Share on X"
+                    >
+                      <i className="fab fa-x-twitter text-sm"></i>
+                    </a>
+                    <button
+                      onClick={handleCopyLink}
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "50%",
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.8)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        cursor: "pointer"
+                      }}
+                      className="hover:bg-white/20 transition"
+                      title="Copy Blog Link"
+                    >
+                      {copied ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-300" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -594,111 +546,6 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                     </button>
                   </div>
                 </div>
-
-                {/* Author Bio Box */}
-                <div
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "20px",
-                    padding: "32px",
-                    marginTop: "48px",
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "24px"
-                  }}
-                  className="shadow-xs flex flex-col sm:flex-row items-start gap-5 sm:gap-6"
-                >
-                  <div
-                    style={{
-                      width: "64px",
-                      height: "64px",
-                      borderRadius: "50%",
-                      backgroundColor: "#094b57",
-                      color: "#ffffff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "24px",
-                      fontWeight: "700",
-                      flexShrink: 0,
-                      boxShadow: "0 4px 12px rgba(9, 75, 87, 0.25)"
-                    }}
-                  >
-                    {post.author.name.charAt(0)}
-                  </div>
-                  <div style={{ flex: "1 1 auto", textAlign: "left" }}>
-                    <div className="flex flex-wrap items-center justify-start gap-2 mb-1">
-                      <h4
-                        style={{
-                          color: "#111827",
-                          fontSize: "18px",
-                          fontWeight: "700",
-                          margin: "0",
-                          textAlign: "left",
-                          textTransform: "none"
-                        }}
-                      >
-                        Written by {post.author.name}
-                      </h4>
-                      <span
-                        style={{
-                          backgroundColor: "rgba(9, 75, 87, 0.1)",
-                          color: "#094b57",
-                          fontSize: "11px",
-                          fontWeight: "600",
-                          padding: "2px 8px",
-                          borderRadius: "9999px"
-                        }}
-                      >
-                        Verified Advisor
-                      </span>
-                    </div>
-                    <p
-                      style={{
-                        color: "#b69455",
-                        fontSize: "13px",
-                        fontWeight: "600",
-                        marginBottom: "12px",
-                        textAlign: "left"
-                      }}
-                    >
-                      {post.author.role}
-                    </p>
-                    <p
-                      style={{
-                        color: "#4b5563",
-                        fontSize: "14px",
-                        lineHeight: "1.6",
-                        marginBottom: "16px",
-                        textAlign: "left"
-                      }}
-                    >
-                      Specializing in custom loan syndication, portfolio asset allocation, and regulatory compliance for families, entrepreneurs, and NRIs across Rajasthan and globally.
-                    </p>
-                    <div
-                      className="flex flex-wrap justify-start gap-5 text-xs font-semibold"
-                      style={{ color: "#094b57" }}
-                    >
-                      <a
-                        href="tel:+919928529222"
-                        className="flex items-center gap-1.5 hover:underline"
-                        style={{ color: "#094b57" }}
-                      >
-                        <PhoneCall className="w-3.5 h-3.5" style={{ color: "#b69455" }} />
-                        <span>+91 99285 29222</span>
-                      </a>
-                      <a
-                        href="mailto:infi@sksinfi.com"
-                        className="flex items-center gap-1.5 hover:underline"
-                        style={{ color: "#094b57" }}
-                      >
-                        <Mail className="w-3.5 h-3.5" style={{ color: "#b69455" }} />
-                        <span>infi@sksinfi.com</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </section>
@@ -767,8 +614,6 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                           <div>
                             <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium mb-2">
                               <span>{rel.publishedDate}</span>
-                              <span>•</span>
-                              <span>{rel.readTime}</span>
                             </div>
                             <h4
                               className="text-sm font-bold leading-snug mb-2 hover:text-[#b69455] transition line-clamp-2 min-h-[42px] flex items-start"

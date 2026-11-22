@@ -114,8 +114,7 @@ function BlogsContent() {
         !q ||
         post.title.toLowerCase().includes(q) ||
         post.excerpt.toLowerCase().includes(q) ||
-        post.tags.some((t) => t.toLowerCase().includes(q)) ||
-        post.author.name.toLowerCase().includes(q);
+        post.tags.some((t) => t.toLowerCase().includes(q));
 
       return matchesCategory && matchesSearch;
     });
@@ -321,16 +320,11 @@ function BlogsContent() {
                     >
                       {/* Section 1: Article content */}
                       <div className="flex flex-col">
-                        {/* Meta: High contrast date, read time, and editorial badge */}
+                        {/* Meta: High contrast date and editorial badge */}
                         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs sm:text-[13px] text-gray-600 font-semibold mb-3">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-[#b69455]" />
                             {featuredPost.publishedDate}
-                          </span>
-                          <span className="text-gray-300">•</span>
-                          <span className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[#b69455]" />
-                            {featuredPost.readTime}
                           </span>
                           <span className="text-gray-300">•</span>
                           <span className="text-[#b69455] font-bold flex items-center gap-1">
@@ -392,27 +386,10 @@ function BlogsContent() {
 
                       {/* Section 3: Footer with subtle separator */}
                       <div className="mt-auto pt-4 sm:pt-5 border-t border-gray-100 sm:border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        {/* Author details on the left */}
-                        <div className="flex items-center gap-3">
-                          {featuredPost.author.avatar ? (
-                            <img
-                              src={featuredPost.author.avatar}
-                              alt={featuredPost.author.name}
-                              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border border-gray-200 shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#094b57] to-[#0c5c6b] text-white flex items-center justify-center font-bold text-sm sm:text-base shrink-0">
-                              {featuredPost.author.name.charAt(0)}
-                            </div>
-                          )}
-                          <div className="flex flex-col justify-center">
-                            <p className="text-sm sm:text-[15px] font-bold text-gray-900 leading-snug m-0">
-                              {featuredPost.author.name}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-0.5 leading-snug m-0">
-                              {featuredPost.author.role}
-                            </p>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-[#094b57] bg-[#094b57]/10 px-3 py-1 rounded-full uppercase tracking-wider">
+                            {featuredPost.category}
+                          </span>
                         </div>
 
                         {/* Read Full Blog CTA positioned at the RIGHT EDGE of content column */}
@@ -567,11 +544,6 @@ function BlogsContent() {
                               <Calendar className="w-3.5 h-3.5 text-[#b69455]" />
                               {post.publishedDate}
                             </span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5 text-[#b69455]" />
-                              {post.readTime}
-                            </span>
                           </div>
 
                           {/* Title */}
@@ -642,29 +614,9 @@ function BlogsContent() {
                             }}
                             className="flex items-center justify-between gap-2"
                           >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div
-                                style={{
-                                  width: "28px",
-                                  height: "28px",
-                                  borderRadius: "50%",
-                                  background: "linear-gradient(135deg, #094b57, #0d6b7a)",
-                                  color: "#ffffff",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  fontWeight: "700",
-                                  fontSize: "11px",
-                                  flexShrink: 0,
-                                  boxShadow: "0 1px 6px rgba(9,75,87,0.3)"
-                                }}
-                              >
-                                {post.author.name.charAt(0)}
-                              </div>
-                              <span className="text-xs font-semibold text-gray-700 truncate">
-                                {post.author.name}
-                              </span>
-                            </div>
+                            <span className="text-[11px] font-bold text-[#094b57] uppercase tracking-wider bg-teal-50 px-2.5 py-0.5 rounded-full">
+                              {post.category}
+                            </span>
 
                             <Link
                               href={`/blogs/${post.slug}`}

@@ -28,11 +28,11 @@ const DEFAULT_BLOG_FORM: BlogFormState = {
   slug: "",
   excerpt: "",
   category: "",
-  authorName: "Arun Mehta",
-  authorRole: "Senior Financial Consultant, SKS INFI",
-  authorAvatar: "/images/user (1).png",
+  authorName: "SKS INFI",
+  authorRole: "Editorial Team",
+  authorAvatar: "",
   publishedDate: "",
-  readTime: "5 min read",
+  readTime: "",
   coverImage: "/images/homeloan.avif",
   tags: "Finance, Advisory, SKS INFI",
   featured: false,
@@ -77,6 +77,48 @@ export default function AdminPage() {
   const [blogModalTab, setBlogModalTab] = useState<"edit" | "preview">("edit");
   const [editorMode, setEditorMode] = useState<"rich" | "html">("rich");
   const editorRef = React.useRef<HTMLDivElement>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const savedSelectionRef = React.useRef<Range | null>(null);
+
+  const saveSelection = () => {
+    if (typeof window !== "undefined") {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedSelectionRef.current = sel.getRangeAt(0).cloneRange();
+      }
+    }
+  };
+
+  const restoreSelection = () => {
+    if (typeof window !== "undefined" && savedSelectionRef.current) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedSelectionRef.current);
+      }
+    }
+  };
+
+  const toggleDropdown = (name: string) => {
+    if (activeDropdown === name) {
+      setActiveDropdown(null);
+    } else {
+      saveSelection();
+      setActiveDropdown(name);
+    }
+  };
+
+  // Close toolbar dropdowns on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".editor-toolbar-dropdown")) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   // Sync contentEditable when modal opens, editorMode switches, or editingBlog changes
   useEffect(() => {
@@ -93,6 +135,7 @@ export default function AdminPage() {
 
   const executeEditorCommand = (command: string, value: string | undefined = undefined) => {
     if (typeof document !== "undefined") {
+      restoreSelection();
       if (editorRef.current && document.activeElement !== editorRef.current) {
         editorRef.current.focus();
       }
@@ -104,6 +147,38 @@ export default function AdminPage() {
           content: currentHtml
         }));
       }
+      setActiveDropdown(null);
+    }
+  };
+
+  const insertCustomHtml = (html: string) => {
+    if (typeof document !== "undefined") {
+      restoreSelection();
+      if (editorRef.current) {
+        editorRef.current.focus();
+        const success = document.execCommand("insertHTML", false, html);
+        if (!success) {
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const el = document.createElement("div");
+            el.innerHTML = html;
+            const frag = document.createDocumentFragment();
+            while (el.firstChild) {
+              frag.appendChild(el.firstChild);
+            }
+            range.insertNode(frag);
+          } else {
+            editorRef.current.innerHTML += html;
+          }
+        }
+        setBlogForm((prev) => ({
+          ...prev,
+          content: editorRef.current?.innerHTML || ""
+        }));
+      }
+      setActiveDropdown(null);
     }
   };
 
@@ -492,11 +567,11 @@ export default function AdminPage() {
       slug: blog.slug,
       excerpt: blog.excerpt || "",
       category: blog.category,
-      authorName: blog.author.name,
-      authorRole: blog.author.role,
-      authorAvatar: blog.author.avatar || "/images/user (1).png",
+      authorName: blog.author?.name || "SKS INFI",
+      authorRole: blog.author?.role || "Editorial Team",
+      authorAvatar: blog.author?.avatar || "",
       publishedDate: blog.publishedDate,
-      readTime: blog.readTime,
+      readTime: blog.readTime || "",
       coverImage: blog.coverImage,
       tags: blog.tags.join(", "),
       featured: Boolean(blog.featured),
@@ -602,12 +677,12 @@ export default function AdminPage() {
         excerpt: blogForm.excerpt.trim() || blogForm.title.trim(),
         category: blogForm.category,
         author: {
-          name: blogForm.authorName.trim(),
-          role: blogForm.authorRole.trim(),
-          avatar: blogForm.authorAvatar.trim()
+          name: (blogForm.authorName || "SKS INFI").trim(),
+          role: (blogForm.authorRole || "Editorial Team").trim(),
+          avatar: (blogForm.authorAvatar || "").trim()
         },
         publishedDate: blogForm.publishedDate.trim(),
-        readTime: blogForm.readTime.trim(),
+        readTime: (blogForm.readTime || "").trim(),
         coverImage: blogForm.coverImage.trim(),
         tags: blogForm.tags,
         featured: blogForm.featured,
@@ -748,7 +823,6 @@ export default function AdminPage() {
         !q ||
         b.title.toLowerCase().includes(q) ||
         b.slug.toLowerCase().includes(q) ||
-        b.author.name.toLowerCase().includes(q) ||
         b.tags.some((t) => t.toLowerCase().includes(q));
 
       return matchesCat && matchesSearch;
@@ -1026,7 +1100,7 @@ export default function AdminPage() {
                   <div className="md:col-span-2 relative">
                     <input
                       type="text"
-                      placeholder="Search articles by title, author, slug or tag..."
+                      placeholder="Search articles by title, slug or tag..."
                       value={blogSearch}
                       onChange={(e) => setBlogSearch(e.target.value)}
                       className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:border-[#b69455] transition"
@@ -1067,7 +1141,6 @@ export default function AdminPage() {
                         <th className="p-3 w-20">Cover</th>
                         <th className="p-3">Title & URL Slug</th>
                         <th className="p-3 w-32">Category</th>
-                        <th className="p-3 w-36">Author</th>
                         <th className="p-3 w-28">Date</th>
                         <th className="p-3 w-24 text-center">Featured</th>
                         <th className="p-3 w-40 text-center">Actions</th>
@@ -1076,13 +1149,13 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-slate-100">
                       {blogsLoading ? (
                         <tr>
-                          <td colSpan={8} className="text-center py-12 text-slate-400">
+                          <td colSpan={7} className="text-center py-12 text-slate-400">
                             <i className="fa fa-spinner fa-spin text-lg mr-2"></i> Loading articles...
                           </td>
                         </tr>
                       ) : filteredBlogs.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="text-center py-12 text-slate-400">
+                          <td colSpan={7} className="text-center py-12 text-slate-400">
                             No articles match your search criteria.
                           </td>
                         </tr>
@@ -1122,14 +1195,6 @@ export default function AdminPage() {
                               <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#eef7f8] text-[#094b57]">
                                 {blog.category}
                               </span>
-                            </td>
-                            <td className="p-3">
-                              <div className="font-semibold text-slate-800">
-                                {blog.author?.name || "Arun Mehta"}
-                              </div>
-                              <div className="text-[11px] text-slate-400 truncate max-w-[130px]">
-                                {blog.author?.role || "Consultant"}
-                              </div>
                             </td>
                             <td className="p-3 text-slate-500 font-medium">
                               {blog.publishedDate}
@@ -1718,270 +1783,819 @@ export default function AdminPage() {
                         cursor: "text"
                       }}
                     >
-                      {/* Primary Toolbar */}
+                      {/* Comprehensive WYSIWYG Toolbar Matching Exact Screenshot */}
                       <div
                         style={{
-                          backgroundColor: "#ffffff",
-                          borderBottom: "1px solid #f1f5f9",
-                          padding: "8px 12px",
+                          backgroundColor: "#f8fafc",
+                          borderBottom: "1px solid #e2e8f0",
+                          padding: "6px 10px",
                           display: "flex",
                           alignItems: "center",
-                          gap: "4px",
-                          flexWrap: "wrap"
+                          gap: "3px",
+                          flexWrap: "wrap",
+                          position: "relative",
+                          userSelect: "none"
                         }}
+                        className="editor-toolbar-dropdown"
                       >
-                        {/* Undo */}
+                        {/* 1. Mode / Pen with dropdown */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("pen_mode")}
+                            title="Editor Mode"
+                            style={{
+                              backgroundColor: activeDropdown === "pen_mode" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#334155",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "pen_mode" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "180px", padding: "4px 0" }}>
+                              <button
+                                type="button"
+                                onClick={() => { setEditorMode("rich"); setActiveDropdown(null); }}
+                                style={{ width: "100%", padding: "8px 12px", border: "none", background: editorMode === "rich" ? "#f1f5f9" : "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#094b57", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                              >
+                                <i className="fa fa-font"></i> Visual Editor Mode
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (editorMode === "rich" && editorRef.current) {
+                                    setBlogForm((prev) => ({ ...prev, content: editorRef.current!.innerHTML }));
+                                  }
+                                  setEditorMode("html");
+                                  setActiveDropdown(null);
+                                }}
+                                style={{ width: "100%", padding: "8px 12px", border: "none", background: editorMode === "html" ? "#f1f5f9" : "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                              >
+                                <i className="fa fa-code"></i> HTML Source View
+                              </button>
+                              <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "4px 0" }} />
+                              <button
+                                type="button"
+                                onClick={() => { handleToolbarPaste(); setActiveDropdown(null); }}
+                                style={{ width: "100%", padding: "8px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontWeight: "500", color: "#475569", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                              >
+                                <i className="fa fa-paste"></i> Paste Clipboard Text
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
+
+                        {/* 2. Undo & Redo */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('undo')}
                           title="Undo (Ctrl+Z)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                         </button>
-
-                        {/* Redo */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('redo')}
                           title="Redo (Ctrl+Y)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
                         </button>
 
-                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
 
-                        {/* Bold */}
+                        {/* 3. Font Family [A v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("font_family")}
+                            title="Font Family"
+                            style={{
+                              backgroundColor: activeDropdown === "font_family" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#334155",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px",
+                              fontWeight: "700",
+                              fontSize: "13px"
+                            }}
+                          >
+                            <span>A</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "font_family" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "160px", padding: "4px 0" }}>
+                              {[
+                                { name: "Inter / Sans Default", font: "Inter, system-ui, sans-serif" },
+                                { name: "Playfair Display", font: "'Playfair Display', Georgia, serif" },
+                                { name: "Georgia", font: "Georgia, serif" },
+                                { name: "Arial", font: "Arial, Helvetica, sans-serif" },
+                                { name: "Times New Roman", font: "'Times New Roman', serif" },
+                                { name: "Courier New", font: "'Courier New', monospace" },
+                                { name: "Trebuchet MS", font: "'Trebuchet MS', sans-serif" }
+                              ].map((f) => (
+                                <button
+                                  key={f.name}
+                                  type="button"
+                                  onClick={() => executeEditorCommand('fontName', f.font)}
+                                  style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontFamily: f.font, color: "#1e293b", cursor: "pointer" }}
+                                >
+                                  {f.name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4. Font Size [TT v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("font_size")}
+                            title="Font Size"
+                            style={{
+                              backgroundColor: activeDropdown === "font_size" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#334155",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px",
+                              fontWeight: "700",
+                              fontSize: "12px"
+                            }}
+                          >
+                            <span>T<span style={{ fontSize: "10px" }}>T</span></span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "font_size" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "140px", padding: "4px 0" }}>
+                              {[
+                                { label: "12px - Small", size: "1" },
+                                { label: "14px - Body", size: "2" },
+                                { label: "16px - Standard", size: "3" },
+                                { label: "18px - Large", size: "4" },
+                                { label: "22px - Subtitle", size: "5" },
+                                { label: "28px - Title", size: "6" },
+                                { label: "34px - Huge", size: "7" }
+                              ].map((s) => (
+                                <button
+                                  key={s.label}
+                                  type="button"
+                                  onClick={() => executeEditorCommand('fontSize', s.size)}
+                                  style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#1e293b", cursor: "pointer" }}
+                                >
+                                  {s.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 5. Format / Headings [Normal v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("format_block")}
+                            title="Paragraph / Headings"
+                            style={{
+                              backgroundColor: activeDropdown === "format_block" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 7px",
+                              color: "#334155",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              height: "28px",
+                              fontWeight: "600",
+                              fontSize: "12px"
+                            }}
+                          >
+                            <span>Normal</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "format_block" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "170px", padding: "4px 0" }}>
+                              {[
+                                { label: "Normal (P)", tag: "<p>", style: { fontSize: "13px" } },
+                                { label: "Heading 1 (H1)", tag: "<h1>", style: { fontSize: "18px", fontWeight: "700" } },
+                                { label: "Heading 2 (H2)", tag: "<h2>", style: { fontSize: "16px", fontWeight: "700" } },
+                                { label: "Heading 3 (H3)", tag: "<h3>", style: { fontSize: "14px", fontWeight: "600" } },
+                                { label: "Heading 4 (H4)", tag: "<h4>", style: { fontSize: "13px", fontWeight: "600" } },
+                                { label: "Blockquote", tag: "<blockquote>", style: { fontSize: "13px", fontStyle: "italic" } },
+                                { label: "Code Block", tag: "<pre>", style: { fontSize: "12px", fontFamily: "monospace" } }
+                              ].map((h) => (
+                                <button
+                                  key={h.label}
+                                  type="button"
+                                  onClick={() => executeEditorCommand('formatBlock', h.tag)}
+                                  style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", color: "#1e293b", cursor: "pointer", ...h.style }}
+                                >
+                                  {h.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
+
+                        {/* 6. Bold */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('bold')}
                           title="Bold (Ctrl+B)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "800", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#1e293b", cursor: "pointer", fontWeight: "800", fontSize: "13px", minWidth: "26px", height: "28px" }}
                         >
                           B
                         </button>
 
-                        {/* Italic */}
+                        {/* 7. Italic */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('italic')}
                           title="Italic (Ctrl+I)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontStyle: "italic", fontFamily: "serif", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#1e293b", cursor: "pointer", fontStyle: "italic", fontFamily: "serif", fontSize: "14px", minWidth: "26px", height: "28px" }}
                         >
                           I
                         </button>
 
-                        {/* Underline */}
+                        {/* 8. Underline */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('underline')}
                           title="Underline (Ctrl+U)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", textDecoration: "underline", fontSize: "14px", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#1e293b", cursor: "pointer", textDecoration: "underline", fontSize: "13px", minWidth: "26px", height: "28px" }}
                         >
                           U
                         </button>
 
-                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
-
-                        {/* H1 */}
+                        {/* 9. Strikethrough */}
                         <button
                           type="button"
-                          onClick={() => executeEditorCommand('formatBlock', '<h1>')}
-                          title="Heading 1"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                          onClick={() => executeEditorCommand('strikeThrough')}
+                          title="Strikethrough"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#1e293b", cursor: "pointer", textDecoration: "line-through", fontSize: "13px", minWidth: "26px", height: "28px" }}
                         >
-                          H<sub style={{ fontSize: "9px" }}>1</sub>
+                          S
                         </button>
 
-                        {/* H2 */}
+                        {/* 10. Text Color [A_] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("text_color")}
+                            title="Text Color"
+                            style={{
+                              backgroundColor: activeDropdown === "text_color" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#094b57",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "26px",
+                              height: "28px",
+                              fontWeight: "700",
+                              fontSize: "12px"
+                            }}
+                          >
+                            <span style={{ lineHeight: 1 }}>A</span>
+                            <div style={{ width: "12px", height: "3px", backgroundColor: "#b69455", marginTop: "1px", borderRadius: "1px" }} />
+                          </button>
+                          {activeDropdown === "text_color" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", padding: "10px", width: "180px" }}>
+                              <div style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Text Color</div>
+                              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", marginBottom: "10px" }}>
+                                {["#000000", "#094b57", "#b69455", "#334155", "#64748b", "#dc2626", "#16a34a", "#2563eb", "#ea580c", "#7c3aed"].map((c) => (
+                                  <button
+                                    key={c}
+                                    type="button"
+                                    onClick={() => executeEditorCommand('foreColor', c)}
+                                    style={{ width: "24px", height: "24px", borderRadius: "4px", backgroundColor: c, border: "1px solid rgba(0,0,0,0.15)", cursor: "pointer" }}
+                                    title={c}
+                                  />
+                                ))}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const custom = prompt("Enter hex color code (e.g. #094b57):", "#094b57");
+                                  if (custom) executeEditorCommand('foreColor', custom);
+                                }}
+                                style={{ width: "100%", padding: "5px", border: "1px solid #e2e8f0", borderRadius: "4px", background: "#f8fafc", fontSize: "11px", color: "#334155", cursor: "pointer", fontWeight: "600" }}
+                              >
+                                Custom Color...
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 11. Highlight Background Pen */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("hilite_color")}
+                            title="Highlight Text Color"
+                            style={{
+                              backgroundColor: activeDropdown === "hilite_color" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#d97706",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "26px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 5 4 4"/><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                          </button>
+                          {activeDropdown === "hilite_color" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", padding: "10px", width: "180px" }}>
+                              <div style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Highlight Color</div>
+                              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px", marginBottom: "8px" }}>
+                                {[
+                                  { color: "#fef08a", name: "Yellow" },
+                                  { color: "#bbf7d0", name: "Green" },
+                                  { color: "#a5f3fc", name: "Cyan" },
+                                  { color: "#fed7aa", name: "Orange" },
+                                  { color: "#fbcfe8", name: "Pink" },
+                                  { color: "#e2e8f0", name: "Gray" },
+                                  { color: "transparent", name: "Clear" }
+                                ].map((h) => (
+                                  <button
+                                    key={h.name}
+                                    type="button"
+                                    onClick={() => executeEditorCommand('hiliteColor', h.color)}
+                                    style={{ width: "32px", height: "24px", borderRadius: "4px", backgroundColor: h.color === "transparent" ? "#ffffff" : h.color, border: "1px solid #cbd5e1", cursor: "pointer", fontSize: "10px", fontWeight: "600", color: "#334155" }}
+                                    title={h.name}
+                                  >
+                                    {h.color === "transparent" ? "✕" : ""}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
+
+                        {/* 12. Link Chain */}
                         <button
                           type="button"
-                          onClick={() => executeEditorCommand('formatBlock', '<h2>')}
-                          title="Heading 2"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                          onClick={() => {
+                            saveSelection();
+                            const u = prompt("Enter web link URL (e.g. https://www.sksinfi.com):");
+                            if (u) executeEditorCommand('createLink', u);
+                          }}
+                          title="Insert Hyperlink"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
-                          H<sub style={{ fontSize: "9px" }}>2</sub>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                         </button>
 
-                        {/* H3 */}
+                        {/* 13. Image [Img v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("image_dropdown")}
+                            title="Insert Image"
+                            style={{
+                              backgroundColor: activeDropdown === "image_dropdown" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#475569",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "image_dropdown" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "200px", padding: "6px 0" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const u = prompt("Enter image URL or path (e.g. /images/homeloan.avif):");
+                                  if (u) {
+                                    insertCustomHtml(`<img src="${u}" alt="Financial article diagram" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0;" /><p><br></p>`);
+                                  }
+                                }}
+                                style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#094b57", cursor: "pointer" }}
+                              >
+                                🌐 Insert Image from URL...
+                              </button>
+                              <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "4px 0" }} />
+                              <div style={{ padding: "4px 12px", fontSize: "10px", fontWeight: "700", color: "#94a3b8", textTransform: "uppercase" }}>Preset Images:</div>
+                              {[
+                                { name: "Home Loan Banner", url: "/images/homeloan.avif" },
+                                { name: "Mutual Fund & SIP", url: "/images/mutual_fund_sip_cover.jpg" },
+                                { name: "Used Car Loan", url: "/images/used_car_loan_cover.jpg" },
+                                { name: "Commercial Vehicle", url: "/images/commercial_vehicle_cover.jpg" },
+                                { name: "Machinery Loan", url: "/images/machinery_loan_cover.jpg" }
+                              ].map((p) => (
+                                <button
+                                  key={p.name}
+                                  type="button"
+                                  onClick={() => insertCustomHtml(`<img src="${p.url}" alt="${p.name}" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0;" /><p><br></p>`)}
+                                  style={{ width: "100%", padding: "6px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#334155", cursor: "pointer" }}
+                                >
+                                  {p.name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 14. Film / Video [Film v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("video_dropdown")}
+                            title="Insert Video Embed"
+                            style={{
+                              backgroundColor: activeDropdown === "video_dropdown" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#475569",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="15" x="2" y="4.5" rx="2"/><polyline points="2 9.5 22 9.5"/><polyline points="2 14.5 22 14.5"/><line x1="7" y1="4.5" x2="7" y2="9.5"/><line x1="17" y1="4.5" x2="17" y2="9.5"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "video_dropdown" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "220px", padding: "6px 0" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const url = prompt("Enter YouTube video link (e.g. https://www.youtube.com/watch?v=...):");
+                                  if (url) {
+                                    let videoId = url.trim();
+                                    try {
+                                      const ytRegex = new RegExp("(?:youtu\\.be/|youtube\\.com/(?:embed/|v/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})");
+                                      const match = url.match(ytRegex);
+                                      if (match && match[1]) {
+                                        videoId = match[1];
+                                      }
+                                    } catch {}
+                                    insertCustomHtml(
+                                      '<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:24px 0; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);"><iframe src="https://www.youtube.com/embed/' +
+                                        videoId +
+                                        '" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe></div><p><br></p>'
+                                    );
+                                  }
+                                }}
+                                style={{ width: "100%", padding: "8px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                              >
+                                <i className="fa fa-youtube-play"></i> Embed YouTube Video...
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 15. Emoji Smile */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("emoji_popover")}
+                            title="Insert Emoji"
+                            style={{
+                              backgroundColor: activeDropdown === "emoji_popover" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#475569",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "26px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                          </button>
+                          {activeDropdown === "emoji_popover" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", padding: "10px", width: "220px" }}>
+                              <div style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Quick Financial Emojis</div>
+                              <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "6px" }}>
+                                {["💡", "📌", "🚀", "📈", "💰", "🏦", "🚗", "🏢", "🛡️", "📞", "⭐", "✅", "⚠️", "ℹ️", "📊", "📝", "🎯", "🔑", "🤝", "🏷️", "💼", "📑", "🔍", "🏆"].map((em) => (
+                                  <button
+                                    key={em}
+                                    type="button"
+                                    onClick={() => insertCustomHtml(em)}
+                                    style={{ width: "28px", height: "28px", border: "1px solid #f1f5f9", background: "#f8fafc", borderRadius: "4px", fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                  >
+                                    {em}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 16. Code <> */}
                         <button
                           type="button"
-                          onClick={() => executeEditorCommand('formatBlock', '<h3>')}
-                          title="Heading 3"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                          onClick={() => {
+                            insertCustomHtml(`<pre style="background:#0f172a; color:#f8fafc; padding:14px 18px; border-radius:8px; font-family:monospace; font-size:13px; overflow-x:auto;"><code>// Advisory calculation snippet or code here</code></pre><p><br></p>`);
+                          }}
+                          title="Insert Code Snippet"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
-                          H<sub style={{ fontSize: "9px" }}>3</sub>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                         </button>
 
-                        {/* Paragraph */}
+                        {/* 17. Google G Templates & Embeds [G v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("g_templates")}
+                            title="Components & Advisory Templates"
+                            style={{
+                              backgroundColor: activeDropdown === "g_templates" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#4285F4",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px",
+                              fontWeight: "800",
+                              fontSize: "13px"
+                            }}
+                          >
+                            <span style={{ color: "#4285F4" }}>G</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "g_templates" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "240px", padding: "6px 0" }}>
+                              <div style={{ padding: "4px 12px", fontSize: "10px", fontWeight: "700", color: "#94a3b8", textTransform: "uppercase" }}>Pre-built Advisory Blocks:</div>
+                              {[
+                                {
+                                  name: "📌 Key Takeaways Box",
+                                  html: `<div style="background:#f0fdf4; border-left:4px solid #16a34a; padding:16px 20px; border-radius:8px; margin:20px 0;"><h4 style="color:#15803d; margin:0 0 8px 0; font-weight:700;">📌 Key Takeaways</h4><p style="color:#166534; margin:0;">Summary point 1: Lower ROI options are best through nationalized banks.<br>Summary point 2: SKS INFI handles complete documentation seamlessly.</p></div><p><br></p>`
+                                },
+                                {
+                                  name: "💡 SKS Advisory Callout",
+                                  html: `<div style="background:#eff6ff; border-left:4px solid #2563eb; padding:16px 20px; border-radius:8px; margin:20px 0;"><h4 style="color:#1d4ed8; margin:0 0 8px 0; font-weight:700;">💡 Financial Advisory Tip</h4><p style="color:#1e40af; margin:0;">Compare loan tenures and prepayment penalties before signing any bank sanction agreement.</p></div><p><br></p>`
+                                },
+                                {
+                                  name: "⚠️ Regulatory Notice / Caution",
+                                  html: `<div style="background:#fefce8; border-left:4px solid #eab308; padding:16px 20px; border-radius:8px; margin:20px 0;"><h4 style="color:#854d0e; margin:0 0 8px 0; font-weight:700;">⚠️ Important Note</h4><p style="color:#713f12; margin:0;">Interest rates are subject to RBI repo rate guidelines and individual credit profiling.</p></div><p><br></p>`
+                                },
+                                {
+                                  name: "📊 Loan Comparison Table",
+                                  html: `<table style="width:100%; border-collapse:collapse; margin:22px 0; font-size:13.5px;"><tr style="background:#094b57; color:#ffffff;"><th style="border:1px solid #cbd5e1; padding:10px 14px; text-align:left;">Parameter</th><th style="border:1px solid #cbd5e1; padding:10px 14px; text-align:left;">Nationalized Banks</th><th style="border:1px solid #cbd5e1; padding:10px 14px; text-align:left;">Private Banks / NBFCs</th></tr><tr><td style="border:1px solid #e2e8f0; padding:10px 14px; font-weight:600;">Interest Rate</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">Competitive Floating (8.25%+)</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">9.50% - 13.00%</td></tr><tr><td style="border:1px solid #e2e8f0; padding:10px 14px; font-weight:600;">Processing Fees</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">NIL to minimal</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">1% to 2% + GST</td></tr><tr><td style="border:1px solid #e2e8f0; padding:10px 14px; font-weight:600;">Foreclosure Charges</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">NIL (Floating loans)</td><td style="border:1px solid #e2e8f0; padding:10px 14px;">Varies</td></tr></table><p><br></p>`
+                                },
+                                {
+                                  name: "🚀 Contact SKS INFI CTA Box",
+                                  html: `<div style="background:linear-gradient(135deg, #094b57 0%, #06323a 100%); color:#ffffff; padding:26px 20px; border-radius:12px; margin:26px 0; text-align:center;"><h3 style="color:#ffffff; margin:0 0 8px 0; font-size:20px;">Ready to Explore Loan Options?</h3><p style="color:#cbd5e1; margin:0 0 16px 0; font-size:14px;">Associated with 95+ Banks & NBFCs across India. Doorstep document pickup & zero hassle.</p><a href="/contact" style="background:#b69455; color:#ffffff; padding:10px 24px; border-radius:50px; text-decoration:none; font-weight:700; display:inline-block; font-size:13px;">Connect With SKS INFI</a></div><p><br></p>`
+                                }
+                              ].map((item) => (
+                                <button
+                                  key={item.name}
+                                  type="button"
+                                  onClick={() => insertCustomHtml(item.html)}
+                                  style={{ width: "100%", padding: "8px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#1e293b", cursor: "pointer" }}
+                                >
+                                  {item.name}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
+
+                        {/* 18. Alignment [Align v] */}
+                        <div style={{ position: "relative" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleDropdown("align_dropdown")}
+                            title="Text Alignment"
+                            style={{
+                              backgroundColor: activeDropdown === "align_dropdown" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#475569",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "2px",
+                              height: "28px"
+                            }}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                          </button>
+                          {activeDropdown === "align_dropdown" && (
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "150px", padding: "4px 0" }}>
+                              {[
+                                { label: "Align Left", cmd: "justifyLeft", icon: "align-left" },
+                                { label: "Align Center", cmd: "justifyCenter", icon: "align-center" },
+                                { label: "Align Right", cmd: "justifyRight", icon: "align-right" },
+                                { label: "Justify Full", cmd: "justifyFull", icon: "align-justify" }
+                              ].map((a) => (
+                                <button
+                                  key={a.label}
+                                  type="button"
+                                  onClick={() => executeEditorCommand(a.cmd)}
+                                  style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                                >
+                                  <i className={`fa fa-${a.icon}`}></i> {a.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 19. Indent Right */}
                         <button
                           type="button"
-                          onClick={() => executeEditorCommand('formatBlock', '<p>')}
-                          title="Paragraph / Normal Text (P)"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#475569", cursor: "pointer", fontWeight: "700", fontSize: "13px", minWidth: "26px", height: "26px" }}
+                          onClick={() => executeEditorCommand('indent')}
+                          title="Increase Indent"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
-                          P
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 8 7 12 3 16"/><line x1="21" y1="12" x2="11" y2="12"/><line x1="21" y1="6" x2="11" y2="6"/><line x1="21" y1="18" x2="11" y2="18"/></svg>
                         </button>
 
-                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
-
-                        {/* Align Left */}
+                        {/* 20. Indent Left */}
                         <button
                           type="button"
-                          onClick={() => executeEditorCommand('justifyLeft')}
-                          title="Align Left"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          onClick={() => executeEditorCommand('outdent')}
+                          title="Decrease Indent"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 8 3 12 7 16"/><line x1="21" y1="12" x2="11" y2="12"/><line x1="21" y1="6" x2="11" y2="6"/><line x1="21" y1="18" x2="11" y2="18"/></svg>
                         </button>
 
-                        {/* Align Center */}
-                        <button
-                          type="button"
-                          onClick={() => executeEditorCommand('justifyCenter')}
-                          title="Align Center"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
-                        >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>
-                        </button>
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
 
-                        {/* Align Right */}
-                        <button
-                          type="button"
-                          onClick={() => executeEditorCommand('justifyRight')}
-                          title="Align Right"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
-                        >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
-                        </button>
-
-                        {/* Justify */}
-                        <button
-                          type="button"
-                          onClick={() => executeEditorCommand('justifyFull')}
-                          title="Justify"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
-                        >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
-                        </button>
-
-                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
-
-                        {/* Bullet List */}
+                        {/* 21. Bullet List */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('insertUnorderedList')}
-                          title="Bullet List"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          title="Bulleted List"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                         </button>
 
-                        {/* Numbered List */}
+                        {/* 22. Numbered List */}
                         <button
                           type="button"
                           onClick={() => executeEditorCommand('insertOrderedList')}
                           title="Numbered List"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px" }}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
                         </button>
 
-                        <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
-
-                        {/* Link */}
+                        {/* 23. Blockquote */}
                         <button
                           type="button"
-                          onClick={() => {
-                            const u = prompt("Enter link URL (e.g. https://www.sksinfi.com):");
-                            if (u) executeEditorCommand('createLink', u);
-                          }}
-                          title="Insert Link"
-                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "6px", padding: "5px 7px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "26px" }}
+                          onClick={() => executeEditorCommand('formatBlock', '<blockquote>')}
+                          title="Blockquote"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px", fontWeight: "700", fontSize: "16px", fontFamily: "serif" }}
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                          “
                         </button>
-                      </div>
 
-                      {/* Sub-toolbar row with highlighter pen matching screenshot */}
-                      <div
-                        style={{
-                          backgroundColor: "#ffffff",
-                          borderBottom: "1px solid #f1f5f9",
-                          padding: "4px 14px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between"
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ color: "#e2e8f0" }}>|</span>
+                        {/* 24. Horizontal Rule */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('insertHorizontalRule')}
+                          title="Insert Horizontal Divider Line"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px", fontWeight: "700", fontSize: "14px" }}
+                        >
+                          ―
+                        </button>
+
+                        <div style={{ width: "1px", height: "18px", backgroundColor: "#cbd5e1", margin: "0 3px" }} />
+
+                        {/* 25. Subscript */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('subscript')}
+                          title="Subscript (X₂)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px", fontWeight: "700", fontSize: "11px" }}
+                        >
+                          X<sub style={{ fontSize: "9px" }}>2</sub>
+                        </button>
+
+                        {/* 26. Superscript */}
+                        <button
+                          type="button"
+                          onClick={() => executeEditorCommand('superscript')}
+                          title="Superscript (X²)"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px", fontWeight: "700", fontSize: "11px" }}
+                        >
+                          X<sup style={{ fontSize: "9px" }}>2</sup>
+                        </button>
+
+                        {/* 27. Direction / Language [Globe v] */}
+                        <div style={{ position: "relative" }}>
                           <button
                             type="button"
-                            onClick={() => {
-                              const c = prompt("Enter text color (e.g. #094b57, #b69455, red):", "#b69455");
-                              if (c) executeEditorCommand('foreColor', c);
-                            }}
-                            title="Text Color / Pen"
+                            onClick={() => toggleDropdown("globe_dropdown")}
+                            title="Text Direction / Language"
                             style={{
-                              background: "none",
-                              border: "none",
-                              color: "#f59e0b",
+                              backgroundColor: activeDropdown === "globe_dropdown" ? "#e2e8f0" : "transparent",
+                              border: "1px solid transparent",
+                              borderRadius: "4px",
+                              padding: "4px 6px",
+                              color: "#475569",
                               cursor: "pointer",
-                              fontSize: "14px",
-                              display: "flex",
-                              alignItems: "center",
-                              padding: "2px 4px"
-                            }}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                          </button>
-
-                          {/* Quick Paste Button */}
-                          <button
-                            type="button"
-                            onClick={handleToolbarPaste}
-                            title="Paste text from clipboard"
-                            style={{
-                              backgroundColor: "#f8fafc",
-                              border: "1px solid #cbd5e1",
-                              borderRadius: "6px",
-                              padding: "3px 8px",
-                              color: "#334155",
-                              cursor: "pointer",
-                              fontSize: "11px",
-                              fontWeight: "700",
                               display: "inline-flex",
                               alignItems: "center",
-                              gap: "4px"
+                              gap: "2px",
+                              height: "28px"
                             }}
                           >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-                            <span>Paste Clipboard</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                           </button>
+                          {activeDropdown === "globe_dropdown" && (
+                            <div style={{ position: "absolute", top: "32px", right: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "160px", padding: "4px 0" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (editorRef.current) {
+                                    editorRef.current.dir = "ltr";
+                                  }
+                                  setActiveDropdown(null);
+                                }}
+                                style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#1e293b", cursor: "pointer" }}
+                              >
+                                Left-to-Right (LTR)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (editorRef.current) {
+                                    editorRef.current.dir = "rtl";
+                                  }
+                                  setActiveDropdown(null);
+                                }}
+                                style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", color: "#1e293b", cursor: "pointer" }}
+                              >
+                                Right-to-Left (RTL)
+                              </button>
+                            </div>
+                          )}
                         </div>
 
+                        {/* 28. Clear Formatting Tx */}
                         <button
                           type="button"
-                          onClick={() => {
-                            if (editorMode === "rich" && editorRef.current) {
-                              const html = editorRef.current.innerHTML;
-                              setBlogForm((prev) => ({ ...prev, content: html }));
-                            }
-                            setEditorMode(editorMode === "rich" ? "html" : "rich");
-                          }}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            color: "#64748b",
-                            cursor: "pointer",
-                            padding: "2px 6px"
-                          }}
+                          onClick={() => executeEditorCommand('removeFormat')}
+                          title="Clear Text Formatting"
+                          style={{ backgroundColor: "transparent", border: "none", borderRadius: "4px", padding: "4px 6px", color: "#ef4444", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "26px", height: "28px", fontWeight: "700", fontSize: "12px" }}
                         >
-                          {editorMode === "rich" ? "</> View HTML" : "Visual Mode"}
+                          <span>T<span style={{ fontSize: "10px", textDecoration: "line-through" }}>x</span></span>
                         </button>
                       </div>
 
@@ -2179,8 +2793,6 @@ export default function AdminPage() {
                       {blogForm.category}
                     </span>
                     <span style={{ color: "#64748b" }}>{blogForm.publishedDate}</span>
-                    <span style={{ color: "#cbd5e1" }}>•</span>
-                    <span style={{ color: "#64748b" }}>{blogForm.readTime}</span>
                   </div>
 
                   <h1 style={{ fontSize: "26px", fontWeight: "700", color: "#094b57", lineHeight: 1.3, margin: 0 }}>
@@ -2192,22 +2804,6 @@ export default function AdminPage() {
                       {blogForm.excerpt}
                     </p>
                   )}
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", backgroundColor: "#f4f6f8", borderRadius: "8px", border: "1px solid #e2e8f0", width: "fit-content" }}>
-                    <img
-                      src={blogForm.authorAvatar || "/images/user (1).png"}
-                      alt={blogForm.authorName}
-                      style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", border: "1px solid #cbd5e1" }}
-                    />
-                    <div>
-                      <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>
-                        {blogForm.authorName}
-                      </div>
-                      <div style={{ fontSize: "11px", color: "#64748b" }}>
-                        {blogForm.authorRole}
-                      </div>
-                    </div>
-                  </div>
 
                   {blogForm.coverImage && (
                     <img
