@@ -504,6 +504,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                       <Link
                         key={tag}
                         href={`/blogs?search=${encodeURIComponent(tag)}`}
+                        rel="nofollow"
                         className="text-xs bg-gray-100 hover:bg-[#094b57] hover:text-white text-gray-700 px-3 py-1 rounded-full transition font-medium no-underline"
                       >
                         #{tag}

@@ -126,6 +126,11 @@ function BlogsContent() {
 
   return (
     <>
+      {Boolean(searchQuery) && (
+        <head>
+          <meta name="robots" content="noindex, follow" />
+        </head>
+      )}
       <div className="min-h-screen flex flex-col bg-[#fdfbf7] text-[#333333]">
         <Navbar
           onOpenEnquiry={(cat) => {

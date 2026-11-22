@@ -32,7 +32,11 @@ const pagesData = pagesDataRaw as Record<
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const cleanSlug = slug.replace(/\.php$/, "");
-  const page = pagesData[cleanSlug];
+  const page =
+    pagesData[cleanSlug] ||
+    (cleanSlug === "sitemap" || cleanSlug === "sitemap.html"
+      ? pagesData["sitemap.html"] || pagesData["sitemap"]
+      : undefined);
 
   if (!page) {
     const blogPost = await resolveBlogPost(cleanSlug);
@@ -55,7 +59,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description =
     page.metaDescription ||
     "SKS INFI provides expert financial planning, investment, loan and insurance services as a trusted Financial Consultant in Jaipur. Contact us today for guidance.";
-  const canonicalUrl = page.canonical || `https://www.sksinfi.com/${slug}`;
+  let canonicalUrl = (page.canonical || `https://www.sksinfi.com/${cleanSlug}`).trim();
+  if (cleanSlug === "sitemap" || cleanSlug === "sitemap.html") {
+    canonicalUrl = "https://www.sksinfi.com/sitemap.html";
+  } else if (canonicalUrl.endsWith(".php")) {
+    canonicalUrl = canonicalUrl.replace(/\.php$/, "");
+  }
   const ogImg = page.ogImage || "https://www.sksinfi.com/img/aboutus.png";
 
   const keywordsList = page.keywords
@@ -118,6 +127,12 @@ export default async function DynamicLegacyPage({ params }: PageProps) {
   }
   if (cleanSlug === "contact" || cleanSlug === "contactus" || cleanSlug === "contact-us") {
     redirect("/contact");
+  }
+  if (cleanSlug === "sitemap" || cleanSlug === "sitemap.html") {
+    const sitemapPage = pagesData["sitemap.html"] || pagesData["sitemap"];
+    if (sitemapPage) {
+      return <LegacyPageRenderer slug="sitemap.html" initialData={sitemapPage} />;
+    }
   }
 
   const page = pagesData[cleanSlug];

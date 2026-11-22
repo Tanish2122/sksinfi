@@ -23,12 +23,29 @@ Disallow: /logs/
 Disallow: /includes/
 Disallow: /cgi-bin/
 
+# Prevent crawlers from indexing internal search queries (Google Search Essentials)
+Disallow: /blogs?*search=*
+Disallow: /*?search=*
+Disallow: /*?*search*
+
+# Prevent crawler noise on static asset files with query strings
+Disallow: /*.ico?*
+Disallow: /*.avif?*
+Disallow: /*.png?*
+Disallow: /*.jpg?*
+
 # ==================================================
 # Google Crawlers
 # ==================================================
 
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /blogs?*search=*
+Disallow: /*?search=*
+Disallow: /*?*search*
+Disallow: /*.ico?*
+Disallow: /*.avif?*
 
 User-agent: Googlebot-Image
 Allow: /
