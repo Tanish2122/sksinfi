@@ -130,10 +130,10 @@ export const authenticFooterHtml = `<style>
           <li><a href="/personal-loan"><i class="fa fa-chevron-right"></i><span>Personal Loan</span></a></li>
           <li><a href="/business-loan"><i class="fa fa-chevron-right"></i><span>Business Loan</span></a></li>
           <li><a href="/car"><i class="fa fa-chevron-right"></i><span>New Car Loan</span></a></li>
-          <li><a href="/car#used-car"><i class="fa fa-chevron-right"></i><span>Used Car Loan</span></a></li>
+          <li><a href="/used-car-loan"><i class="fa fa-chevron-right"></i><span>Used Car Loan</span></a></li>
           <li><a href="/education"><i class="fa fa-chevron-right"></i><span>Education Loan</span></a></li>
           <li><a href="/commercial_vehicle"><i class="fa fa-chevron-right"></i><span>Commercial Vehicle Loan</span></a></li>
-          <li><a href="/loan#commercial-equipment"><i class="fa fa-chevron-right"></i><span>Commercial Equipment Loan</span></a></li>
+          <li><a href="/commercial-equipment-loan"><i class="fa fa-chevron-right"></i><span>Commercial Equipment Loan</span></a></li>
           <li><a href="/machinery-loan"><i class="fa fa-chevron-right"></i><span>Machinery Loan</span></a></li>
         </ul>
       </div>

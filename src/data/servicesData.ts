@@ -238,24 +238,24 @@ export const servicesData: ServiceItem[] = [
   },
   {
     id: "commercial-equipment",
-    slug: "commercial-equipment",
+    slug: "commercial-equipment-loan",
     category: "loans",
     categoryLabel: "Loans & Financing",
-    title: "Commercial Equipment & Machinery Loans",
-    shortDesc: "High-ticket asset financing for heavy earthmoving equipment, cranes, construction machinery, and industrial plants.",
-    fullDesc: "Empower your construction, infrastructure, and manufacturing operations with flexible commercial equipment financing. SKS INFI facilitates customized credit for excavators, cranes, road equipment, concrete mixers, and manufacturing plant machinery with up to 90% funding and structured repayment aligned with project billing cycles.",
+    title: "Commercial Equipment Loan",
+    shortDesc: "High-ticket asset financing for heavy earthmoving equipment, cranes, construction machinery, and mining assets.",
+    fullDesc: "Empower your construction, infrastructure, and mining operations with flexible commercial equipment financing. SKS INFI facilitates customized credit for excavators, cranes, road equipment, concrete mixers, tippers, and heavy equipment with up to 90% funding and structured repayment aligned with project billing cycles.",
     interestRate: "Starting @ 9.25% p.a.",
     tenure: "Up to 7 Years",
     maxAmount: "Up to ₹25 Crore",
     features: [
       "Funding for earthmoving, construction, and mining equipment",
-      "Industrial manufacturing plant and machinery loans",
+      "Excavators, backhoes, cranes, road rollers & concrete batching plants",
       "Up to 90% financing on machine cost with low down payment",
       "Customized repayment tenures aligned with project milestone cash flows"
     ],
     eligibility: [
       "Civil contractors, EPC firms, and infrastructure companies",
-      "Manufacturing MSMEs and industrial units with 2+ years vintage",
+      "Mining contractors and logistics operators with 2+ years vintage",
       "Valid GST registration and clean banking history"
     ],
     documents: [
@@ -266,6 +266,37 @@ export const servicesData: ServiceItem[] = [
     ],
     icon: "HardHat",
     image: "/images/loans/commercial_equipment.jpg"
+  },
+  {
+    id: "machinery-loan",
+    slug: "machinery-loan",
+    category: "loans",
+    categoryLabel: "Loans & Financing",
+    title: "Machinery Loan",
+    shortDesc: "Upgrade manufacturing plants and industrial production lines with collateral-free credit and low-interest machinery loans.",
+    fullDesc: "Adoption of modern technology is must for quality production, cost savings, and market competitiveness. SKS INFI offers customised machinery loan solutions for new or used, indigenous or imported machines with high LTV, collateral-free credit options up to ₹5 Cr, and quick approvals.",
+    interestRate: "Competitive Floating Rates",
+    tenure: "Up to 7 Years",
+    maxAmount: "Up to ₹15 Crore",
+    features: [
+      "Funding for indigenous or imported new & pre-owned plant machinery",
+      "Collateral-free options up to ₹5 Crore under CGTMSE & MSME schemes",
+      "Up to 90% funding on proforma invoice value",
+      "Assistance with state capital subsidies (RIPS / Central Subsidies)"
+    ],
+    eligibility: [
+      "Manufacturing units, MSMEs, and industrial enterprises",
+      "Minimum 1-2 years of operational track record",
+      "Satisfactory credit rating & ITR documentation"
+    ],
+    documents: [
+      "Proforma invoice / machine quotation from verified OEM",
+      "Business PAN, GST registration & KYC of promoters",
+      "Last 2 years audited financials and 12 months bank statements",
+      "Factory or plant premises ownership/lease agreement"
+    ],
+    icon: "Cpu",
+    image: "/img/loan_c/Machienry_Loan.png"
   },
   // ================= INVESTMENTS =================
   {
