@@ -430,35 +430,13 @@ export default function AdminPage() {
         serverBlogs = await res.json();
       }
 
-      if (typeof window !== "undefined") {
-        const deletedSlugs: string[] = JSON.parse(
-          localStorage.getItem("sks_deleted_blog_slugs") || "[]"
-        );
-        const customBlogs: BlogPost[] = JSON.parse(
-          localStorage.getItem("sks_custom_blogs") || "[]"
-        );
-
-        // Filter out locally deleted slugs
-        let merged = (serverBlogs.length > 0 ? serverBlogs : []).filter(
-          (b) => !deletedSlugs.includes(b.slug.toLowerCase().trim())
-        );
-
-        // Add custom locally created/edited blogs
-        for (const cb of customBlogs) {
-          const cleanCbSlug = cb.slug.toLowerCase().trim();
-          const existingIdx = merged.findIndex((b) => b.slug.toLowerCase().trim() === cleanCbSlug);
-          if (existingIdx >= 0) {
-            merged[existingIdx] = {
-              ...cb,
-              ...merged[existingIdx]
-            };
-          } else {
-            merged.unshift(cb);
-          }
-        }
-        setBlogs(merged);
-      } else {
+      if (Array.isArray(serverBlogs)) {
         setBlogs(serverBlogs);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("sks_custom_blogs", JSON.stringify(serverBlogs));
+          } catch {}
+        }
       }
     } catch (e) {
       console.error("Failed to load blogs:", e);

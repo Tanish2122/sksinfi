@@ -28,7 +28,11 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
         .or(`slug.eq.${clean},slug.ilike.${clean}`)
         .maybeSingle();
 
-      if (!error && data) {
+      if (!error) {
+        if (!data) {
+          return undefined;
+        }
+
         const diskFallback = BLOGS_DATA.find(
           (b) =>
             b.slug.toLowerCase().trim() === clean ||
@@ -133,9 +137,7 @@ export async function getAllCurrentBlogs(): Promise<BlogPost[]> {
             },
             publishedDate: b.published_at || b.publishedDate || "Recently",
             readTime: b.read_time || b.readTime || "5 min read",
-            coverImage: (b.cover_image && !b.cover_image.startsWith("data:"))
-              ? b.cover_image
-              : diskFallback?.coverImage || b.cover_image || "/images/homeloan.avif",
+            coverImage: b.cover_image || diskFallback?.coverImage || "/images/homeloan.avif",
             tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : diskFallback?.tags || [],
             featured: Boolean(b.is_featured ?? b.featured ?? diskFallback?.featured),
             takeaways: Array.isArray(b.takeaways) && b.takeaways.length > 0 ? b.takeaways : diskFallback?.takeaways || [],

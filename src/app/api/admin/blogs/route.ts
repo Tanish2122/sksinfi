@@ -23,7 +23,7 @@ async function readBlogs(): Promise<BlogPost[]> {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && Array.isArray(data) && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         const sbBlogs: BlogPost[] = data.map((b: any): BlogPost => {
           const diskFallback = BLOGS_DATA.find(
             (item) => item.slug.toLowerCase().trim() === (b.slug || "").toLowerCase().trim()
@@ -50,13 +50,7 @@ async function readBlogs(): Promise<BlogPost[]> {
           };
         });
 
-        // Merge any disk/default blogs that aren't in Supabase yet so nothing is lost
-        const existingSlugs = new Set(sbBlogs.map((b) => b.slug.toLowerCase().trim()));
-        for (const defaultBlog of BLOGS_DATA) {
-          if (!existingSlugs.has(defaultBlog.slug.toLowerCase().trim())) {
-            sbBlogs.push(defaultBlog);
-          }
-        }
+        // Supabase database is the single source of truth - return only what is in the database
         return sbBlogs;
       }
     } catch (sbErr) {

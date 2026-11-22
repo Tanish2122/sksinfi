@@ -50,58 +50,27 @@ function BlogsContent() {
 
   const [blogsList, setBlogsList] = useState<typeof BLOGS_DATA>(BLOGS_DATA);
 
-  // Sync with dynamic blogs API and local storage filters
+  // Sync with dynamic blogs API
   useEffect(() => {
-    const sanitizeAndSet = (baseList: typeof BLOGS_DATA) => {
-      if (typeof window !== "undefined") {
-        try {
-          const deletedSlugs: string[] = JSON.parse(
-            localStorage.getItem("sks_deleted_blog_slugs") || "[]"
-          );
-          const customBlogs: typeof BLOGS_DATA = JSON.parse(
-            localStorage.getItem("sks_custom_blogs") || "[]"
-          );
-
-          let updated = baseList.filter(
-            (b) => !deletedSlugs.includes(b.slug.toLowerCase().trim())
-          );
-
-          for (const cb of customBlogs) {
-            const cleanCbSlug = cb.slug.toLowerCase().trim();
-            const existingIdx = updated.findIndex(
-              (b) => b.slug.toLowerCase().trim() === cleanCbSlug
-            );
-            if (existingIdx >= 0) {
-              updated[existingIdx] = cb;
-            } else {
-              updated.unshift(cb);
-            }
-          }
-          setBlogsList(updated);
-          return;
-        } catch {}
-      }
-      setBlogsList(baseList);
-    };
-
-    // First sanitize default list immediately from local storage
-    sanitizeAndSet(BLOGS_DATA);
-
-    // Then fetch fresh data from API
     fetch("/api/admin/blogs", {
       cache: "no-store",
       headers: { "Cache-Control": "no-cache" }
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          sanitizeAndSet(data);
+        if (Array.isArray(data)) {
+          setBlogsList(data);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("Notice: fallback to local blog list:", err);
+      });
   }, []);
 
-  const categories = getAllCategories();
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(blogsList.map((b) => b.category).filter(Boolean)));
+    return ["All", ...cats];
+  }, [blogsList]);
 
   // Filter blogs based on category & search term
   const filteredBlogs = useMemo(() => {
