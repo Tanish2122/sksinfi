@@ -79,6 +79,71 @@ export default function AdminPage() {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const savedSelectionRef = React.useRef<Range | null>(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingInline, setUploadingInline] = useState(false);
+  const coverFileInputRef = React.useRef<HTMLInputElement>(null);
+  const inlineFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const uploadImageFile = async (file: File): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Upload failed with status ${res.status}`);
+      }
+      const data = await res.json();
+      return data.url;
+    } catch (err: any) {
+      alert("Failed to upload image: " + err.message);
+      return null;
+    }
+  };
+
+  const handleCoverFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const url = await uploadImageFile(file);
+      if (url) {
+        setBlogForm((prev) => ({ ...prev, coverImage: url }));
+        setNotification({
+          type: "success",
+          message: "Cover image uploaded successfully!"
+        });
+      }
+    } finally {
+      setUploadingCover(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleInlineFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingInline(true);
+    setActiveDropdown(null);
+    try {
+      const url = await uploadImageFile(file);
+      if (url) {
+        insertCustomHtml(
+          `<img src="${url}" alt="${file.name.replace(/[^a-zA-Z0-9 ]/g, ' ')}" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0; display:block;" /><p><br></p>`
+        );
+        setNotification({
+          type: "success",
+          message: "Image inserted into article!"
+        });
+      }
+    } finally {
+      setUploadingInline(false);
+      if (e.target) e.target.value = "";
+    }
+  };
 
   const saveSelection = () => {
     if (typeof window !== "undefined") {
@@ -184,6 +249,26 @@ export default function AdminPage() {
 
   // Robust Clipboard Paste Handler
   const handleEditorPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    // If user pasted an image file directly (screenshot or copied file)
+    if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+      const file = e.clipboardData.files[0];
+      if (file.type.startsWith("image/")) {
+        e.preventDefault();
+        uploadImageFile(file).then((url) => {
+          if (url) {
+            insertCustomHtml(
+              `<img src="${url}" alt="Pasted image" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0; display:block;" /><p><br></p>`
+            );
+            setNotification({
+              type: "success",
+              message: "Pasted image uploaded and inserted!"
+            });
+          }
+        });
+        return;
+      }
+    }
+
     e.preventDefault();
 
     const clipboardHtml = e.clipboardData.getData("text/html");
@@ -2205,7 +2290,27 @@ export default function AdminPage() {
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                           </button>
                           {activeDropdown === "image_dropdown" && (
-                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "200px", padding: "6px 0" }}>
+                            <div style={{ position: "absolute", top: "32px", left: "0", zIndex: 100, backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "8px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.15)", minWidth: "230px", padding: "6px 0" }}>
+                              {/* Hidden file input for inline toolbar upload */}
+                              <input
+                                ref={inlineFileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleInlineFileUpload}
+                                style={{ display: "none" }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  inlineFileInputRef.current?.click();
+                                  setActiveDropdown(null);
+                                }}
+                                style={{ width: "100%", padding: "8px 14px", border: "none", background: "#f8fafc", textAlign: "left", fontSize: "12px", fontWeight: "700", color: "#094b57", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                              >
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b69455" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span>Upload Image from Device...</span>
+                              </button>
+                              <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "4px 0" }} />
                               <button
                                 type="button"
                                 onClick={() => {
@@ -2214,7 +2319,7 @@ export default function AdminPage() {
                                     insertCustomHtml(`<img src="${u}" alt="Financial article diagram" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0;" /><p><br></p>`);
                                   }
                                 }}
-                                style={{ width: "100%", padding: "7px 12px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#094b57", cursor: "pointer" }}
+                                style={{ width: "100%", padding: "7px 14px", border: "none", background: "transparent", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
                               >
                                 🌐 Insert Image from URL...
                               </button>
@@ -2607,6 +2712,23 @@ export default function AdminPage() {
                           suppressContentEditableWarning={true}
                           tabIndex={0}
                           onPaste={handleEditorPaste}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={async (e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files?.[0];
+                            if (file && file.type.startsWith("image/")) {
+                              const url = await uploadImageFile(file);
+                              if (url) {
+                                insertCustomHtml(
+                                  `<img src="${url}" alt="${file.name.replace(/[^a-zA-Z0-9 ]/g, ' ')}" style="width:100%; max-width:760px; height:auto; border-radius:10px; margin:20px 0; border:1px solid #e2e8f0; display:block;" /><p><br></p>`
+                                );
+                                setNotification({
+                                  type: "success",
+                                  message: "Dropped image uploaded and inserted!"
+                                });
+                              }
+                            }
+                          }}
                           onInput={(e) => {
                             const html = e.currentTarget.innerHTML;
                             setBlogForm((prev) => ({
@@ -2689,26 +2811,81 @@ export default function AdminPage() {
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
-                        COVER IMAGE URL
-                      </label>
+                      {/* Hidden Cover Image file input */}
+                      <input
+                        ref={coverFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCoverFileUpload}
+                        style={{ display: "none" }}
+                      />
+
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                        <label style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase" }}>
+                          COVER IMAGE
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => coverFileInputRef.current?.click()}
+                          disabled={uploadingCover}
+                          style={{
+                            backgroundColor: uploadingCover ? "#94a3b8" : "#094b57",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "6px 14px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            cursor: uploadingCover ? "not-allowed" : "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            boxShadow: "0 2px 5px rgba(9, 75, 87, 0.2)",
+                            transition: "all 0.2s"
+                          }}
+                        >
+                          {uploadingCover ? (
+                            <>
+                              <i className="fa fa-spinner fa-spin"></i>
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                              <span>Upload Image</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
                       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                         <input
                           type="text"
-                          placeholder="/images/homeloan.avif"
+                          placeholder="Or enter image URL (e.g. /images/homeloan.avif)"
                           value={blogForm.coverImage}
                           onChange={(e) => setBlogForm((prev) => ({ ...prev, coverImage: e.target.value }))}
                           style={{ flex: 1, backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 16px", fontSize: "13px", color: "#1e293b", outline: "none" }}
                         />
                         {blogForm.coverImage && (
-                          <img
-                            src={blogForm.coverImage}
-                            alt="Cover"
-                            style={{ width: "42px", height: "42px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                            onError={(e) => { (e.target as HTMLImageElement).src = "/images/homeloan.avif"; }}
-                          />
+                          <div style={{ position: "relative", flexShrink: 0 }}>
+                            <img
+                              src={blogForm.coverImage}
+                              alt="Cover Preview"
+                              style={{ width: "48px", height: "42px", objectFit: "cover", borderRadius: "8px", border: "1px solid #cbd5e1" }}
+                              onError={(e) => { (e.target as HTMLImageElement).src = "/images/homeloan.avif"; }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setBlogForm((prev) => ({ ...prev, coverImage: "" }))}
+                              title="Remove cover image"
+                              style={{ position: "absolute", top: "-6px", right: "-6px", width: "18px", height: "18px", borderRadius: "50%", background: "#ef4444", color: "#fff", border: "none", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                            >
+                              ✕
+                            </button>
+                          </div>
                         )}
                       </div>
+
                       {/* Presets */}
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", marginTop: "8px" }}>
                         <span style={{ fontSize: "11px", color: "#94a3b8" }}>Presets:</span>
@@ -2735,43 +2912,17 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  {/* Author & Settings Row */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
-                        AUTHOR NAME
-                      </label>
+                  {/* Featured Article Row */}
+                  <div style={{ paddingTop: "14px", borderTop: "1px solid #f1f5f9" }}>
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "600", color: "#1e293b", padding: "10px 16px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
                       <input
-                        type="text"
-                        value={blogForm.authorName}
-                        onChange={(e) => setBlogForm((prev) => ({ ...prev, authorName: e.target.value }))}
-                        style={{ width: "100%", backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 14px", fontSize: "13px", color: "#1e293b", outline: "none" }}
+                        type="checkbox"
+                        checked={blogForm.featured}
+                        onChange={(e) => setBlogForm((prev) => ({ ...prev, featured: e.target.checked }))}
+                        style={{ width: "18px", height: "18px", accentColor: "#b69455", cursor: "pointer" }}
                       />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#8898aa", textTransform: "uppercase", marginBottom: "8px" }}>
-                        READ TIME
-                      </label>
-                      <input
-                        type="text"
-                        value={blogForm.readTime}
-                        onChange={(e) => setBlogForm((prev) => ({ ...prev, readTime: e.target.value }))}
-                        style={{ width: "100%", backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 14px", fontSize: "13px", color: "#1e293b", outline: "none" }}
-                      />
-                    </div>
-
-                    <div style={{ display: "flex", alignItems: "center", paddingTop: "26px" }}>
-                      <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600", color: "#334155" }}>
-                        <input
-                          type="checkbox"
-                          checked={blogForm.featured}
-                          onChange={(e) => setBlogForm((prev) => ({ ...prev, featured: e.target.checked }))}
-                          style={{ width: "18px", height: "18px", accentColor: "#b69455", cursor: "pointer" }}
-                        />
-                        <span>⭐ Mark as Featured</span>
-                      </label>
-                    </div>
+                      <span>⭐ Mark as Featured Article (Highlighted on Blog Index)</span>
+                    </label>
                   </div>
                 </div>
               ) : (
