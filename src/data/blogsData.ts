@@ -17,6 +17,8 @@ export interface BlogPost {
   featured?: boolean;
   takeaways: string[];
   content: string; // Rich HTML/Markdown-style formatted content
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export const BLOGS_DATA: BlogPost[] = blogsJson as BlogPost[];

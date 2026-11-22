@@ -93,6 +93,8 @@ create table if not exists public.blogs (
   content text not null,
   is_published boolean default true,
   is_featured boolean default false,
+  meta_title text,
+  meta_description text,
   published_at timestamp with time zone default timezone('utc'::text, now()) not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

@@ -45,7 +45,9 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
           tags: Array.isArray(data.tags) ? data.tags : [],
           featured: Boolean(data.is_featured ?? data.featured),
           takeaways: Array.isArray(data.takeaways) ? data.takeaways : [],
-          content: data.content || ""
+          content: data.content || "",
+          metaTitle: data.meta_title || data.metaTitle || undefined,
+          metaDescription: data.meta_description || data.metaDescription || undefined
         };
       }
     } catch (e) {
@@ -125,7 +127,9 @@ export async function getAllCurrentBlogs(): Promise<BlogPost[]> {
           tags: Array.isArray(b.tags) ? b.tags : [],
           featured: Boolean(b.is_featured ?? b.featured),
           takeaways: Array.isArray(b.takeaways) ? b.takeaways : [],
-          content: b.content || ""
+          content: b.content || "",
+          metaTitle: b.meta_title || b.metaTitle || undefined,
+          metaDescription: b.meta_description || b.metaDescription || undefined
         }));
       }
     } catch {}

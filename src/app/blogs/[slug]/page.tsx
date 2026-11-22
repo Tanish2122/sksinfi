@@ -30,24 +30,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const metaTitle = post.metaTitle?.trim() || `${post.title} | SKS INFI`;
+  const metaDescription = post.metaDescription?.trim() || post.excerpt;
+
   return {
-    title: `${post.title} | SKS INFI`,
-    description: post.excerpt,
+    title: metaTitle,
+    description: metaDescription,
     keywords: post.tags,
-    authors: [{ name: "SKS INFI" }],
+    authors: [{ name: post.author?.name || "SKS INFI" }],
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
+      title: metaTitle,
+      description: metaDescription,
       type: "article",
       publishedTime: post.publishedDate,
-      authors: ["SKS INFI"],
+      authors: [post.author?.name || "SKS INFI"],
       tags: post.tags,
       images: [
         {
           url: post.coverImage,
           width: 1200,
           height: 630,
-          alt: post.title,
+          alt: metaTitle,
         },
       ],
     },
@@ -56,8 +59,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt,
+      title: metaTitle,
+      description: metaDescription,
       images: [post.coverImage],
     },
   };
@@ -76,8 +79,8 @@ export default async function SingleBlogPage({ params }: PageProps) {
     ? {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
-        headline: post.title,
-        description: post.excerpt,
+        headline: post.metaTitle || post.title,
+        description: post.metaDescription || post.excerpt,
         image: `https://www.sksinfi.com${post.coverImage}`,
         datePublished: post.publishedDate,
         author: {

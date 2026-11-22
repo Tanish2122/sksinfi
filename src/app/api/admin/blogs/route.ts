@@ -40,7 +40,9 @@ async function readBlogs(): Promise<BlogPost[]> {
           tags: Array.isArray(b.tags) ? b.tags : [],
           featured: Boolean(b.is_featured ?? b.featured),
           takeaways: Array.isArray(b.takeaways) ? b.takeaways : [],
-          content: b.content || ""
+          content: b.content || "",
+          metaTitle: b.meta_title || b.metaTitle || undefined,
+          metaDescription: b.meta_description || b.metaDescription || undefined
         }));
       }
     } catch (sbErr) {
@@ -169,7 +171,9 @@ export async function POST(req: NextRequest) {
       featured,
       takeaways,
       content,
-      originalSlug
+      originalSlug,
+      metaTitle,
+      metaDescription
     } = body;
 
     if (!title || !content) {
@@ -216,7 +220,9 @@ export async function POST(req: NextRequest) {
         : typeof takeaways === "string"
         ? takeaways.split("\n").map((t: string) => t.trim()).filter(Boolean)
         : [],
-      content: content.trim()
+      content: content.trim(),
+      metaTitle: metaTitle?.trim() || undefined,
+      metaDescription: metaDescription?.trim() || undefined
     };
 
     // Supabase synchronization if configured
@@ -231,7 +237,7 @@ export async function POST(req: NextRequest) {
             .eq("slug", originalSlug.toLowerCase().trim());
         }
 
-        const { error: sbUpsertErr } = await sbClient.from("blogs").upsert([{
+        const sbPayload: any = {
           slug: newBlog.slug,
           title: newBlog.title,
           excerpt: newBlog.excerpt,
@@ -246,8 +252,20 @@ export async function POST(req: NextRequest) {
           is_featured: newBlog.featured,
           takeaways: newBlog.takeaways,
           content: newBlog.content,
-          is_published: true
-        }]);
+          is_published: true,
+          meta_title: newBlog.metaTitle || null,
+          meta_description: newBlog.metaDescription || null
+        };
+
+        let { error: sbUpsertErr } = await sbClient.from("blogs").upsert([sbPayload]);
+
+        if (sbUpsertErr && (sbUpsertErr.message?.includes("meta_") || sbUpsertErr.code === "PGRST204")) {
+          // If columns don't exist in remote Supabase table yet, retry without them
+          delete sbPayload.meta_title;
+          delete sbPayload.meta_description;
+          const retry = await sbClient.from("blogs").upsert([sbPayload]);
+          sbUpsertErr = retry.error;
+        }
 
         if (sbUpsertErr) {
           console.warn("Supabase blog upsert warning:", sbUpsertErr);

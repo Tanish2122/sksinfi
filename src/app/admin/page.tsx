@@ -21,6 +21,8 @@ interface BlogFormState {
   featured: boolean;
   takeaways: string;
   content: string;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 const DEFAULT_BLOG_FORM: BlogFormState = {
@@ -37,7 +39,9 @@ const DEFAULT_BLOG_FORM: BlogFormState = {
   tags: "Finance, Advisory, SKS INFI",
   featured: false,
   takeaways: "",
-  content: ""
+  content: "",
+  metaTitle: "",
+  metaDescription: ""
 };
 
 const PRESET_COVERS = [
@@ -661,7 +665,9 @@ export default function AdminPage() {
       tags: blog.tags.join(", "),
       featured: Boolean(blog.featured),
       takeaways: blog.takeaways.join("\n"),
-      content: blog.content
+      content: blog.content,
+      metaTitle: blog.metaTitle || "",
+      metaDescription: blog.metaDescription || ""
     });
     setBlogModalTab("edit");
     setShowBlogModal(true);
@@ -773,7 +779,9 @@ export default function AdminPage() {
         featured: blogForm.featured,
         takeaways: blogForm.takeaways,
         content: liveContent,
-        originalSlug: editingBlog?.slug
+        originalSlug: editingBlog?.slug,
+        metaTitle: blogForm.metaTitle.trim(),
+        metaDescription: blogForm.metaDescription.trim()
       };
 
       // Also persist in localStorage
@@ -806,7 +814,9 @@ export default function AdminPage() {
               typeof payload.takeaways === "string"
                 ? payload.takeaways.split("\n").map((t: string) => t.trim()).filter(Boolean)
                 : [],
-            content: payload.content
+            content: payload.content,
+            metaTitle: payload.metaTitle || undefined,
+            metaDescription: payload.metaDescription || undefined
           };
 
           const customBlogs: BlogPost[] = JSON.parse(
@@ -2912,6 +2922,105 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  {/* SEO & Search Engine Meta Tags Card */}
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "18px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "16px" }}>🔍</span>
+                        <span style={{ fontSize: "12px", fontWeight: "800", letterSpacing: "0.05em", color: "#094b57", textTransform: "uppercase" }}>
+                          SEO & Search Engine Meta Tags
+                        </span>
+                      </div>
+                      <span style={{ fontSize: "11px", color: "#64748b" }}>
+                        Optimizes your Google ranking and search snippet
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                      {/* Meta Title */}
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <label style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#475569", textTransform: "uppercase" }}>
+                            Meta Title (Page Title Tag)
+                          </label>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (blogForm.title) {
+                                  const trimmed = blogForm.title.trim();
+                                  const withBrand = trimmed.endsWith("SKS INFI") ? trimmed : `${trimmed} | SKS INFI`;
+                                  setBlogForm((prev) => ({ ...prev, metaTitle: withBrand }));
+                                }
+                              }}
+                              style={{ background: "none", border: "none", color: "#094b57", fontSize: "11px", fontWeight: "700", cursor: "pointer", textDecoration: "underline" }}
+                            >
+                              ✨ Auto-fill from Title
+                            </button>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: (blogForm.metaTitle.length >= 50 && blogForm.metaTitle.length <= 60) ? "#16a34a" : blogForm.metaTitle.length > 60 ? "#dc2626" : "#64748b" }}>
+                              {blogForm.metaTitle.length}/60 chars
+                            </span>
+                          </div>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder={blogForm.title ? `${blogForm.title} | SKS INFI` : "e.g. Best Home Loan Interest Rates in Jaipur (2025) | SKS INFI"}
+                          value={blogForm.metaTitle}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, metaTitle: e.target.value }))}
+                          style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#1e293b", outline: "none" }}
+                        />
+                      </div>
+
+                      {/* Meta Description */}
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <label style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.05em", color: "#475569", textTransform: "uppercase" }}>
+                            Meta Description (Google Snippet)
+                          </label>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (blogForm.excerpt) {
+                                  setBlogForm((prev) => ({ ...prev, metaDescription: blogForm.excerpt.trim() }));
+                                }
+                              }}
+                              style={{ background: "none", border: "none", color: "#094b57", fontSize: "11px", fontWeight: "700", cursor: "pointer", textDecoration: "underline" }}
+                            >
+                              ✨ Auto-fill from Excerpt
+                            </button>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: (blogForm.metaDescription.length >= 140 && blogForm.metaDescription.length <= 160) ? "#16a34a" : blogForm.metaDescription.length > 160 ? "#dc2626" : "#64748b" }}>
+                              {blogForm.metaDescription.length}/160 chars
+                            </span>
+                          </div>
+                        </div>
+                        <textarea
+                          rows={2}
+                          placeholder={blogForm.excerpt || "Enter an engaging 140-160 character summary that entices users to click on search engines..."}
+                          value={blogForm.metaDescription}
+                          onChange={(e) => setBlogForm((prev) => ({ ...prev, metaDescription: e.target.value }))}
+                          style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#1e293b", outline: "none", resize: "vertical" }}
+                        />
+                      </div>
+
+                      {/* Live Google Search Result Preview */}
+                      <div style={{ marginTop: "4px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                        <div style={{ fontSize: "10px", fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>
+                          Google Search Result Preview:
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#202124", display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                          <span>https://www.sksinfi.com › blogs › {blogForm.slug || "article-slug"}</span>
+                        </div>
+                        <div style={{ fontSize: "16px", color: "#1a0dab", fontWeight: "500", lineHeight: "1.3", cursor: "pointer", textDecoration: "underline" }}>
+                          {blogForm.metaTitle || (blogForm.title ? `${blogForm.title} | SKS INFI` : "Article Title | SKS INFI")}
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#4d5156", marginTop: "3px", lineHeight: "1.4" }}>
+                          {blogForm.metaDescription || blogForm.excerpt || "Meta description snippet will appear here on Google search results. Make it informative and click-worthy."}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Featured Article Row */}
                   <div style={{ paddingTop: "14px", borderTop: "1px solid #f1f5f9" }}>
                     <label style={{ display: "inline-flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "13px", fontWeight: "600", color: "#1e293b", padding: "10px 16px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
@@ -2954,6 +3063,14 @@ export default function AdminPage() {
                     <p style={{ fontSize: "14px", color: "#475569", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>
                       {blogForm.excerpt}
                     </p>
+                  )}
+
+                  {(blogForm.metaTitle || blogForm.metaDescription) && (
+                    <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#64748b" }}>
+                      <strong style={{ color: "#094b57" }}>🔍 SEO Meta:</strong>{" "}
+                      {blogForm.metaTitle && <span>Title: &ldquo;{blogForm.metaTitle}&rdquo; &bull; </span>}
+                      {blogForm.metaDescription && <span>Snippet: &ldquo;{blogForm.metaDescription}&rdquo;</span>}
+                    </div>
                   )}
 
                   {blogForm.coverImage && (
