@@ -28,6 +28,23 @@ interface SingleBlogClientProps {
   relatedPosts: BlogPost[];
 }
 
+function formatDate(d?: string): string {
+  if (!d) return "Recently";
+  if (d.includes("T") || !isNaN(Date.parse(d))) {
+    try {
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+    } catch {}
+  }
+  return d;
+}
+
 export default function SingleBlogClient({ post: initialPost, slug, relatedPosts }: SingleBlogClientProps) {
   const [post, setPost] = useState<BlogPost | null>(initialPost);
   const [loading, setLoading] = useState<boolean>(!initialPost);
@@ -292,17 +309,32 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
 
             <div className="container mx-auto px-4 relative z-10">
               <div className="max-w-4xl mx-auto">
-                {/* Back to blogs link */}
-                <div className="mb-5">
-                  <Link
-                    href="/blogs"
-                    style={{ color: "rgba(255, 255, 255, 0.85)", textDecoration: "none" }}
-                    className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold hover:text-white transition group"
-                  >
-                    <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-[#e9c787]" />
-                    <span>Back to Financial Insights</span>
-                  </Link>
-                </div>
+                {/* Breadcrumbs Navigation */}
+                <nav aria-label="Breadcrumb" className="mb-4">
+                  <ol className="flex items-center flex-wrap gap-2 text-xs md:text-sm font-semibold text-white/80">
+                    <li>
+                      <Link href="/" style={{ color: "#e9c787", textDecoration: "none" }} className="hover:text-white transition">
+                        Home
+                      </Link>
+                    </li>
+                    <li className="text-white/40">/</li>
+                    <li>
+                      <Link href="/blogs" style={{ color: "#e9c787", textDecoration: "none" }} className="hover:text-white transition">
+                        Blogs
+                      </Link>
+                    </li>
+                    <li className="text-white/40">/</li>
+                    <li>
+                      <Link
+                        href={`/blogs?category=${encodeURIComponent(post.category)}`}
+                        style={{ color: "#e9c787", textDecoration: "none" }}
+                        className="hover:text-white transition"
+                      >
+                        {post.category}
+                      </Link>
+                    </li>
+                  </ol>
+                </nav>
 
                 {/* Category Pill */}
                 <div className="inline-block mb-4">
@@ -341,7 +373,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                   <div className="flex items-center gap-3 text-xs sm:text-sm text-white/80">
                     <span className="flex items-center gap-1.5 font-medium">
                       <Calendar className="w-3.5 h-3.5 text-[#e9c787]" />
-                      {post.publishedDate}
+                      {formatDate(post.publishedDate)}
                     </span>
                     <span className="text-white/30">•</span>
                     <span className="bg-white/10 text-[#e9c787] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -613,7 +645,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                         <div className="p-5 flex-1 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium mb-2">
-                              <span>{rel.publishedDate}</span>
+                              <span>{formatDate(rel.publishedDate)}</span>
                             </div>
                             <h4
                               className="text-sm font-bold leading-snug mb-2 hover:text-[#b69455] transition line-clamp-2 min-h-[42px] flex items-start"

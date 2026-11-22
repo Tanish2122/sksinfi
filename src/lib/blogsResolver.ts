@@ -29,6 +29,12 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
         .maybeSingle();
 
       if (!error && data) {
+        const diskFallback = BLOGS_DATA.find(
+          (b) =>
+            b.slug.toLowerCase().trim() === clean ||
+            b.slug.toLowerCase().trim().replace(/-/g, "") === clean.replace(/-/g, "")
+        );
+
         return {
           slug: data.slug,
           title: data.title,
@@ -41,13 +47,15 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
           },
           publishedDate: data.published_at || data.publishedDate || "Recently",
           readTime: data.read_time || data.readTime || "5 min read",
-          coverImage: data.cover_image || data.coverImage || "/images/homeloan.avif",
-          tags: Array.isArray(data.tags) ? data.tags : [],
-          featured: Boolean(data.is_featured ?? data.featured),
-          takeaways: Array.isArray(data.takeaways) ? data.takeaways : [],
-          content: data.content || "",
-          metaTitle: data.meta_title || data.metaTitle || undefined,
-          metaDescription: data.meta_description || data.metaDescription || undefined
+          coverImage: (data.cover_image && !data.cover_image.startsWith("data:"))
+            ? data.cover_image
+            : diskFallback?.coverImage || data.cover_image || "/images/homeloan.avif",
+          tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : diskFallback?.tags || [],
+          featured: Boolean(data.is_featured ?? data.featured ?? diskFallback?.featured),
+          takeaways: Array.isArray(data.takeaways) && data.takeaways.length > 0 ? data.takeaways : diskFallback?.takeaways || [],
+          content: data.content || diskFallback?.content || "",
+          metaTitle: data.meta_title || data.metaTitle || diskFallback?.metaTitle || undefined,
+          metaDescription: data.meta_description || data.metaDescription || diskFallback?.metaDescription || undefined
         };
       }
     } catch (e) {
@@ -111,26 +119,33 @@ export async function getAllCurrentBlogs(): Promise<BlogPost[]> {
         .order("created_at", { ascending: false });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((b: any) => ({
-          slug: b.slug,
-          title: b.title,
-          excerpt: b.excerpt || b.title,
-          category: b.category || "Loans",
-          author: {
-            name: b.author_name || "Arun Mehta",
-            role: b.author_role || "Senior Financial Consultant, SKS INFI",
-            avatar: b.author_avatar || "/images/user (1).png"
-          },
-          publishedDate: b.published_at || b.publishedDate || "Recently",
-          readTime: b.read_time || b.readTime || "5 min read",
-          coverImage: b.cover_image || b.coverImage || "/images/homeloan.avif",
-          tags: Array.isArray(b.tags) ? b.tags : [],
-          featured: Boolean(b.is_featured ?? b.featured),
-          takeaways: Array.isArray(b.takeaways) ? b.takeaways : [],
-          content: b.content || "",
-          metaTitle: b.meta_title || b.metaTitle || undefined,
-          metaDescription: b.meta_description || b.metaDescription || undefined
-        }));
+        return data.map((b: any) => {
+          const diskFallback = BLOGS_DATA.find(
+            (item) => item.slug.toLowerCase().trim() === (b.slug || "").toLowerCase().trim()
+          );
+          return {
+            slug: b.slug,
+            title: b.title,
+            excerpt: b.excerpt || b.title,
+            category: b.category || "Loans",
+            author: {
+              name: b.author_name || "Arun Mehta",
+              role: b.author_role || "Senior Financial Consultant, SKS INFI",
+              avatar: b.author_avatar || "/images/user (1).png"
+            },
+            publishedDate: b.published_at || b.publishedDate || "Recently",
+            readTime: b.read_time || b.readTime || "5 min read",
+            coverImage: (b.cover_image && !b.cover_image.startsWith("data:"))
+              ? b.cover_image
+              : diskFallback?.coverImage || b.cover_image || "/images/homeloan.avif",
+            tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : diskFallback?.tags || [],
+            featured: Boolean(b.is_featured ?? b.featured ?? diskFallback?.featured),
+            takeaways: Array.isArray(b.takeaways) && b.takeaways.length > 0 ? b.takeaways : diskFallback?.takeaways || [],
+            content: b.content || diskFallback?.content || "",
+            metaTitle: b.meta_title || b.metaTitle || diskFallback?.metaTitle || undefined,
+            metaDescription: b.meta_description || b.metaDescription || diskFallback?.metaDescription || undefined
+          };
+        });
       }
     } catch {}
   }

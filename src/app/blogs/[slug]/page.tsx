@@ -18,6 +18,26 @@ export async function generateStaticParams() {
   }));
 }
 
+function extractFaqItems(content: string): Array<{ question: string; answer: string }> {
+  const faqItems: Array<{ question: string; answer: string }> = [];
+  try {
+    const faqSectionMatch = content.match(/<h[23][^>]*>(?:Frequently Asked Questions|FAQ|FAQs)<\/h[23]>([\s\S]*)/i);
+    if (!faqSectionMatch) return [];
+
+    const sectionHtml = faqSectionMatch[1];
+    const regex = /<h[34][^>]*>([\s\S]*?)<\/h[34]>\s*<p[^>]*>([\s\S]*?)<\/p>/gi;
+    let match;
+    while ((match = regex.exec(sectionHtml)) !== null) {
+      const q = match[1].replace(/<[^>]+>/g, "").trim();
+      const a = match[2].replace(/<[^>]+>/g, "").trim();
+      if (q && a) {
+        faqItems.push({ question: q, answer: a });
+      }
+    }
+  } catch {}
+  return faqItems;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const clean = cleanBlogSlug(slug);
@@ -32,22 +52,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const metaTitle = post.metaTitle?.trim() || `${post.title} | SKS INFI`;
   const metaDescription = post.metaDescription?.trim() || post.excerpt;
+  const canonicalUrl = `https://www.sksinfi.com/blogs/${post.slug}`;
+  const absoluteImageUrl = post.coverImage.startsWith("http")
+    ? post.coverImage
+    : post.coverImage.startsWith("data:")
+    ? "https://www.sksinfi.com/images/homeloan.avif"
+    : `https://www.sksinfi.com${post.coverImage.startsWith("/") ? "" : "/"}${post.coverImage}`;
 
   return {
     title: metaTitle,
     description: metaDescription,
-    keywords: post.tags,
+    keywords: post.tags && post.tags.length > 0 ? post.tags : ["Financial Planning", "Advisory", "SKS INFI"],
     authors: [{ name: post.author?.name || "SKS INFI" }],
     openGraph: {
       title: metaTitle,
       description: metaDescription,
+      url: canonicalUrl,
+      siteName: "SKS INFI",
+      locale: "en_IN",
       type: "article",
       publishedTime: post.publishedDate,
       authors: [post.author?.name || "SKS INFI"],
       tags: post.tags,
       images: [
         {
-          url: post.coverImage,
+          url: absoluteImageUrl,
           width: 1200,
           height: 630,
           alt: metaTitle,
@@ -55,13 +84,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
     },
     alternates: {
-      canonical: `https://www.sksinfi.com/blogs/${post.slug}`
+      canonical: canonicalUrl,
     },
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
       description: metaDescription,
-      images: [post.coverImage],
+      images: [absoluteImageUrl],
     },
   };
 }
@@ -75,33 +104,98 @@ export default async function SingleBlogPage({ params }: PageProps) {
   const allPosts = await getAllCurrentBlogs();
   const relatedPosts = allPosts.filter((p) => !post || p.slug !== post.slug).slice(0, 3);
 
-  const jsonLd = post
-    ? {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: post.metaTitle || post.title,
-        description: post.metaDescription || post.excerpt,
-        image: `https://www.sksinfi.com${post.coverImage}`,
-        datePublished: post.publishedDate,
-        author: {
-          "@type": "Organization",
-          name: "SKS INFI",
-          url: "https://www.sksinfi.com",
+  let jsonLd = null;
+  if (post) {
+    const canonicalUrl = `https://www.sksinfi.com/blogs/${post.slug}`;
+    const absoluteImageUrl = post.coverImage.startsWith("http")
+      ? post.coverImage
+      : post.coverImage.startsWith("data:")
+      ? "https://www.sksinfi.com/images/homeloan.avif"
+      : `https://www.sksinfi.com${post.coverImage.startsWith("/") ? "" : "/"}${post.coverImage}`;
+
+    const blogPostingSchema: any = {
+      "@type": "BlogPosting",
+      "@id": `${canonicalUrl}#article`,
+      headline: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt,
+      image: absoluteImageUrl,
+      datePublished: post.publishedDate,
+      dateModified: post.publishedDate,
+      articleSection: post.category,
+      inLanguage: "en-IN",
+      author: {
+        "@type": "Organization",
+        name: "SKS INFI",
+        url: "https://www.sksinfi.com",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "SKS INFI",
+        url: "https://www.sksinfi.com",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://www.sksinfi.com/images/skslogo.png",
         },
-        publisher: {
-          "@type": "Organization",
-          name: "SKS INFI",
-          logo: {
-            "@type": "ImageObject",
-            url: "https://www.sksinfi.com/images/skslogo.png",
-          },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
+    };
+
+    if (post.tags && post.tags.length > 0) {
+      blogPostingSchema.keywords = post.tags.join(", ");
+    }
+
+    const breadcrumbSchema = {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://www.sksinfi.com",
         },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": `https://www.sksinfi.com/blogs/${post.slug}`,
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Blogs",
+          item: "https://www.sksinfi.com/blogs",
         },
-      }
-    : null;
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.title,
+          item: canonicalUrl,
+        },
+      ],
+    };
+
+    const faqItems = extractFaqItems(post.content);
+    const faqSchema =
+      faqItems.length > 0
+        ? {
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          }
+        : null;
+
+    jsonLd = {
+      "@context": "https://schema.org",
+      "@graph": [
+        blogPostingSchema,
+        breadcrumbSchema,
+        ...(faqSchema ? [faqSchema] : []),
+      ],
+    };
+  }
 
   return (
     <>

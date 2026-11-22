@@ -24,26 +24,33 @@ async function readBlogs(): Promise<BlogPost[]> {
         .order("created_at", { ascending: false });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((b: any) => ({
-          slug: b.slug,
-          title: b.title,
-          excerpt: b.excerpt || b.title,
-          category: b.category || "Loans",
-          author: {
-            name: b.author_name || "Arun Mehta",
-            role: b.author_role || "Senior Financial Consultant, SKS INFI",
-            avatar: b.author_avatar || "/images/user (1).png"
-          },
-          publishedDate: b.published_at || b.publishedDate || "Recently",
-          readTime: b.read_time || b.readTime || "5 min read",
-          coverImage: b.cover_image || b.coverImage || "/images/homeloan.avif",
-          tags: Array.isArray(b.tags) ? b.tags : [],
-          featured: Boolean(b.is_featured ?? b.featured),
-          takeaways: Array.isArray(b.takeaways) ? b.takeaways : [],
-          content: b.content || "",
-          metaTitle: b.meta_title || b.metaTitle || undefined,
-          metaDescription: b.meta_description || b.metaDescription || undefined
-        }));
+        return data.map((b: any) => {
+          const diskFallback = BLOGS_DATA.find(
+            (item) => item.slug.toLowerCase().trim() === (b.slug || "").toLowerCase().trim()
+          );
+          return {
+            slug: b.slug,
+            title: b.title,
+            excerpt: b.excerpt || b.title,
+            category: b.category || "Loans",
+            author: {
+              name: b.author_name || "Arun Mehta",
+              role: b.author_role || "Senior Financial Consultant, SKS INFI",
+              avatar: b.author_avatar || "/images/user (1).png"
+            },
+            publishedDate: b.published_at || b.publishedDate || "Recently",
+            readTime: b.read_time || b.readTime || "5 min read",
+            coverImage: (b.cover_image && !b.cover_image.startsWith("data:"))
+              ? b.cover_image
+              : diskFallback?.coverImage || b.cover_image || "/images/homeloan.avif",
+            tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : diskFallback?.tags || [],
+            featured: Boolean(b.is_featured ?? b.featured ?? diskFallback?.featured),
+            takeaways: Array.isArray(b.takeaways) && b.takeaways.length > 0 ? b.takeaways : diskFallback?.takeaways || [],
+            content: b.content || diskFallback?.content || "",
+            metaTitle: b.meta_title || b.metaTitle || diskFallback?.metaTitle || undefined,
+            metaDescription: b.meta_description || b.metaDescription || diskFallback?.metaDescription || undefined
+          };
+        });
       }
     } catch (sbErr) {
       console.warn("Supabase read error, falling back to disk/tmp:", sbErr);
