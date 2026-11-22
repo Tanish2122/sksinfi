@@ -47,9 +47,7 @@ export async function resolveBlogPost(slug: string): Promise<BlogPost | undefine
           },
           publishedDate: data.published_at || data.publishedDate || "Recently",
           readTime: data.read_time || data.readTime || "5 min read",
-          coverImage: (data.cover_image && !data.cover_image.startsWith("data:"))
-            ? data.cover_image
-            : diskFallback?.coverImage || data.cover_image || "/images/homeloan.avif",
+          coverImage: data.cover_image || diskFallback?.coverImage || "/images/homeloan.avif",
           tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : diskFallback?.tags || [],
           featured: Boolean(data.is_featured ?? data.featured ?? diskFallback?.featured),
           takeaways: Array.isArray(data.takeaways) && data.takeaways.length > 0 ? data.takeaways : diskFallback?.takeaways || [],

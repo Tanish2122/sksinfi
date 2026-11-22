@@ -24,7 +24,7 @@ async function readBlogs(): Promise<BlogPost[]> {
         .order("created_at", { ascending: false });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((b: any) => {
+        const sbBlogs: BlogPost[] = data.map((b: any): BlogPost => {
           const diskFallback = BLOGS_DATA.find(
             (item) => item.slug.toLowerCase().trim() === (b.slug || "").toLowerCase().trim()
           );
@@ -40,9 +40,7 @@ async function readBlogs(): Promise<BlogPost[]> {
             },
             publishedDate: b.published_at || b.publishedDate || "Recently",
             readTime: b.read_time || b.readTime || "5 min read",
-            coverImage: (b.cover_image && !b.cover_image.startsWith("data:"))
-              ? b.cover_image
-              : diskFallback?.coverImage || b.cover_image || "/images/homeloan.avif",
+            coverImage: b.cover_image || diskFallback?.coverImage || "/images/homeloan.avif",
             tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : diskFallback?.tags || [],
             featured: Boolean(b.is_featured ?? b.featured ?? diskFallback?.featured),
             takeaways: Array.isArray(b.takeaways) && b.takeaways.length > 0 ? b.takeaways : diskFallback?.takeaways || [],
@@ -51,6 +49,15 @@ async function readBlogs(): Promise<BlogPost[]> {
             metaDescription: b.meta_description || b.metaDescription || diskFallback?.metaDescription || undefined
           };
         });
+
+        // Merge any disk/default blogs that aren't in Supabase yet so nothing is lost
+        const existingSlugs = new Set(sbBlogs.map((b) => b.slug.toLowerCase().trim()));
+        for (const defaultBlog of BLOGS_DATA) {
+          if (!existingSlugs.has(defaultBlog.slug.toLowerCase().trim())) {
+            sbBlogs.push(defaultBlog);
+          }
+        }
+        return sbBlogs;
       }
     } catch (sbErr) {
       console.warn("Supabase read error, falling back to disk/tmp:", sbErr);
@@ -264,13 +271,17 @@ export async function POST(req: NextRequest) {
           meta_description: newBlog.metaDescription || null
         };
 
-        let { error: sbUpsertErr } = await sbClient.from("blogs").upsert([sbPayload]);
+        let { error: sbUpsertErr } = await sbClient
+          .from("blogs")
+          .upsert([sbPayload], { onConflict: "slug" });
 
         if (sbUpsertErr && (sbUpsertErr.message?.includes("meta_") || sbUpsertErr.code === "PGRST204")) {
           // If columns don't exist in remote Supabase table yet, retry without them
           delete sbPayload.meta_title;
           delete sbPayload.meta_description;
-          const retry = await sbClient.from("blogs").upsert([sbPayload]);
+          const retry = await sbClient
+            .from("blogs")
+            .upsert([sbPayload], { onConflict: "slug" });
           sbUpsertErr = retry.error;
         }
 

@@ -47,6 +47,10 @@ const DEFAULT_BLOG_FORM: BlogFormState = {
 const PRESET_COVERS = [
   { label: "Home Loan", url: "/images/homeloan.avif" },
   { label: "Mutual Fund & SIP", url: "/images/mutual_fund_sip_cover.jpg" },
+  { label: "Business Loans", url: "/images/msme_business_loan_cover.jpg" },
+  { label: "Real Estate", url: "/images/nri_real_estate_cover.jpg" },
+  { label: "Insurance", url: "/images/factory_insurance_cover.jpg" },
+  { label: "Tax Planning", url: "/images/tax_planning_cover.jpg" },
   { label: "Corporate Finance", url: "/img/aboutus.png" },
   { label: "Consultant / Advisory", url: "/img/sksl.jpg" }
 ];
@@ -444,7 +448,10 @@ export default function AdminPage() {
           const cleanCbSlug = cb.slug.toLowerCase().trim();
           const existingIdx = merged.findIndex((b) => b.slug.toLowerCase().trim() === cleanCbSlug);
           if (existingIdx >= 0) {
-            merged[existingIdx] = cb;
+            merged[existingIdx] = {
+              ...cb,
+              ...merged[existingIdx]
+            };
           } else {
             merged.unshift(cb);
           }
@@ -2877,18 +2884,24 @@ export default function AdminPage() {
                           style={{ flex: 1, backgroundColor: "#f4f6f8", border: "1px solid #edf2f7", borderRadius: "12px", padding: "12px 16px", fontSize: "13px", color: "#1e293b", outline: "none" }}
                         />
                         {blogForm.coverImage && (
-                          <div style={{ position: "relative", flexShrink: 0 }}>
-                            <img
-                              src={blogForm.coverImage}
-                              alt="Cover Preview"
-                              style={{ width: "48px", height: "42px", objectFit: "cover", borderRadius: "8px", border: "1px solid #cbd5e1" }}
-                              onError={(e) => { (e.target as HTMLImageElement).src = "/images/homeloan.avif"; }}
-                            />
+                          <div style={{ position: "relative", flexShrink: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                            <div
+                              onClick={() => coverFileInputRef.current?.click()}
+                              title="Click to change image"
+                              style={{ cursor: "pointer", position: "relative" }}
+                            >
+                              <img
+                                src={blogForm.coverImage}
+                                alt="Cover Preview"
+                                style={{ width: "54px", height: "42px", objectFit: "cover", borderRadius: "8px", border: "2px solid #094b57" }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = "/images/homeloan.avif"; }}
+                              />
+                            </div>
                             <button
                               type="button"
                               onClick={() => setBlogForm((prev) => ({ ...prev, coverImage: "" }))}
                               title="Remove cover image"
-                              style={{ position: "absolute", top: "-6px", right: "-6px", width: "18px", height: "18px", borderRadius: "50%", background: "#ef4444", color: "#fff", border: "none", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                              style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#ef4444", color: "#fff", border: "none", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
                             >
                               ✕
                             </button>
