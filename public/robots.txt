@@ -23,10 +23,19 @@ Disallow: /logs/
 Disallow: /includes/
 Disallow: /cgi-bin/
 
-# Prevent crawlers from indexing internal search queries (Google Search Essentials)
+# Prevent crawlers from indexing internal search queries & category filters (Google Search Essentials)
 Disallow: /blogs?*search=*
+Disallow: /blogs?*category=*
 Disallow: /*?search=*
 Disallow: /*?*search*
+Disallow: /*?category=*
+Disallow: /*?*category*
+
+# Block legacy WordPress and spam query parameter crawl noise
+Disallow: /*?products*
+Disallow: /*?*products*
+Disallow: /*?s=*
+Disallow: /*?*s=*
 
 # Prevent crawler noise on static asset files with query strings
 Disallow: /*.ico?*
@@ -42,8 +51,15 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin/
 Disallow: /blogs?*search=*
+Disallow: /blogs?*category=*
 Disallow: /*?search=*
 Disallow: /*?*search*
+Disallow: /*?category=*
+Disallow: /*?*category*
+Disallow: /*?products*
+Disallow: /*?*products*
+Disallow: /*?s=*
+Disallow: /*?*s=*
 Disallow: /*.ico?*
 Disallow: /*.avif?*
 

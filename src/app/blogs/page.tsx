@@ -126,7 +126,7 @@ function BlogsContent() {
 
   return (
     <>
-      {Boolean(searchQuery) && (
+      {(Boolean(searchQuery) || (selectedCategory && selectedCategory !== "All")) && (
         <head>
           <meta name="robots" content="noindex, follow" />
         </head>

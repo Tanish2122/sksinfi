@@ -327,6 +327,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                     <li>
                       <Link
                         href={`/blogs?category=${encodeURIComponent(post.category)}`}
+                        rel="nofollow"
                         style={{ color: "#e9c787", textDecoration: "none" }}
                         className="hover:text-white transition"
                       >
@@ -340,6 +341,7 @@ export default function SingleBlogClient({ post: initialPost, slug, relatedPosts
                 <div className="inline-block mb-4">
                   <Link
                     href={`/blogs?category=${encodeURIComponent(post.category)}`}
+                    rel="nofollow"
                     style={{
                       backgroundColor: "rgba(182, 148, 85, 0.25)",
                       color: "#e9c787",
