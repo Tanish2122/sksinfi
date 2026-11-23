@@ -55,6 +55,24 @@ const PRESET_COVERS = [
   { label: "Consultant / Advisory", url: "/img/sksl.jpg" }
 ];
 
+function formatDate(d?: string): string {
+  if (!d) return "Recently";
+  const trimmed = d.trim();
+  if (trimmed.includes("T") || !isNaN(Date.parse(trimmed))) {
+    try {
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+    } catch {}
+  }
+  return trimmed;
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<
     "blogs" | "contact" | "loan" | "partner" | "banner"
@@ -1276,8 +1294,8 @@ export default function AdminPage() {
                                 {blog.category}
                               </span>
                             </td>
-                            <td className="p-3 text-slate-500 font-medium">
-                              {blog.publishedDate}
+                            <td className="p-3 text-slate-500 font-medium whitespace-nowrap">
+                              {formatDate(blog.publishedDate)}
                             </td>
                             <td className="p-3 text-center">
                               {blog.featured ? (
@@ -3043,7 +3061,7 @@ export default function AdminPage() {
                     >
                       {blogForm.category}
                     </span>
-                    <span style={{ color: "#64748b" }}>{blogForm.publishedDate}</span>
+                    <span style={{ color: "#64748b" }}>{formatDate(blogForm.publishedDate)}</span>
                   </div>
 
                   <h1 style={{ fontSize: "26px", fontWeight: "700", color: "#094b57", lineHeight: 1.3, margin: 0 }}>

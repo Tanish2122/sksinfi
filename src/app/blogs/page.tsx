@@ -29,6 +29,24 @@ const formatEditorialTitle = (title: string) => {
   return title.replace(/(\S)\s+&\s+(\S)/g, "$1\u00A0&\u00A0$2");
 };
 
+function formatDate(d?: string): string {
+  if (!d) return "Recently";
+  const trimmed = d.trim();
+  if (trimmed.includes("T") || !isNaN(Date.parse(trimmed))) {
+    try {
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+    } catch {}
+  }
+  return trimmed;
+}
+
 function BlogsContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
@@ -298,7 +316,7 @@ function BlogsContent() {
                         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs sm:text-[13px] text-gray-600 font-semibold mb-3">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-[#b69455]" />
-                            {featuredPost.publishedDate}
+                            {formatDate(featuredPost.publishedDate)}
                           </span>
                           <span className="text-gray-300">•</span>
                           <span className="text-[#b69455] font-bold flex items-center gap-1">
@@ -516,7 +534,7 @@ function BlogsContent() {
                           >
                             <span className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-[#b69455]" />
-                              {post.publishedDate}
+                              {formatDate(post.publishedDate)}
                             </span>
                           </div>
 

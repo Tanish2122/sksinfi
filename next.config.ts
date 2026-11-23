@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/sitemap.html",
+        destination: "/sitemap",
+        permanent: true,
+      },
+      {
         source: "/sksinfin",
         destination: "/#why-sks-infi",
         permanent: true,
@@ -40,6 +45,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/calculate_sip.php",
+        destination: "/calculate_sip",
+        permanent: true,
+      },
+      {
         source: "/partner-with-us.php",
         destination: "/partner-with-us",
         permanent: true,
@@ -50,7 +60,17 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/enquirynow",
+        destination: "/contact",
+        permanent: true,
+      },
+      {
         source: "/enquirynow.php",
+        destination: "/contact",
+        permanent: true,
+      },
+      {
+        source: "/apply-now",
         destination: "/contact",
         permanent: true,
       },

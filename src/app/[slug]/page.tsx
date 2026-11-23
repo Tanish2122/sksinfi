@@ -51,17 +51,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
     return {
       title: "SKS INFI | Financial Consultant in Jaipur",
-      description: "SKS INFI provides expert financial planning, investment, loan and insurance services as a trusted Financial Consultant in Jaipur."
+      description: "SKS INFI provides expert financial planning, investment, loan and insurance services as a trusted Financial Consultant in Jaipur.",
+      robots: {
+        index: false,
+        follow: false
+      }
     };
   }
 
+  const isSitemap = cleanSlug === "sitemap" || cleanSlug === "sitemap.html";
   const title = page.title || "SKS INFI | Financial Consultant in Jaipur";
   const description =
     page.metaDescription ||
     "SKS INFI provides expert financial planning, investment, loan and insurance services as a trusted Financial Consultant in Jaipur. Contact us today for guidance.";
   let canonicalUrl = (page.canonical || `https://www.sksinfi.com/${cleanSlug}`).trim();
-  if (cleanSlug === "sitemap" || cleanSlug === "sitemap.html") {
-    canonicalUrl = "https://www.sksinfi.com/sitemap.html";
+  if (isSitemap) {
+    canonicalUrl = "https://www.sksinfi.com/sitemap";
   } else if (canonicalUrl.endsWith(".php")) {
     canonicalUrl = canonicalUrl.replace(/\.php$/, "");
   }
@@ -101,17 +106,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: page.twitterDescription || description,
       images: [page.twitterImage || ogImg]
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1
-      }
-    }
+    robots: isSitemap
+      ? {
+          index: false,
+          follow: true,
+          googleBot: {
+            index: false,
+            follow: true
+          }
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1
+          }
+        }
   };
 }
 
@@ -131,10 +145,13 @@ export default async function DynamicLegacyPage({ params }: PageProps) {
   if (cleanSlug === "contact" || cleanSlug === "contactus" || cleanSlug === "contact-us") {
     redirect("/contact");
   }
-  if (cleanSlug === "sitemap" || cleanSlug === "sitemap.html") {
-    const sitemapPage = pagesData["sitemap.html"] || pagesData["sitemap"];
+  if (cleanSlug === "sitemap.html") {
+    redirect("/sitemap");
+  }
+  if (cleanSlug === "sitemap") {
+    const sitemapPage = pagesData["sitemap"] || pagesData["sitemap.html"];
     if (sitemapPage) {
-      return <LegacyPageRenderer slug="sitemap.html" initialData={sitemapPage} />;
+      return <LegacyPageRenderer slug="sitemap" initialData={sitemapPage} />;
     }
   }
 

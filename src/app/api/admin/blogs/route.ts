@@ -11,6 +11,24 @@ export const revalidate = 0;
 const BLOGS_FILE_PATH = path.join(process.cwd(), "src", "data", "blogs.json");
 const TMP_BLOGS_PATH = path.join(os.tmpdir(), "sks_blogs.json");
 
+function formatDate(d?: string): string {
+  if (!d) return "Recently";
+  const trimmed = d.trim();
+  if (trimmed.includes("T") || !isNaN(Date.parse(trimmed))) {
+    try {
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+    } catch {}
+  }
+  return trimmed;
+}
+
 // Helper to read blogs from Supabase, os.tmpdir(), or disk
 async function readBlogs(): Promise<BlogPost[]> {
   const sbClient = supabaseAdmin || supabase;
@@ -38,7 +56,7 @@ async function readBlogs(): Promise<BlogPost[]> {
               role: b.author_role || "Senior Financial Consultant, SKS INFI",
               avatar: b.author_avatar || "/images/user (1).png"
             },
-            publishedDate: b.published_at || b.publishedDate || "Recently",
+            publishedDate: formatDate(b.published_at || b.publishedDate || "Recently"),
             readTime: b.read_time || b.readTime || "5 min read",
             coverImage: b.cover_image || diskFallback?.coverImage || "/images/homeloan.avif",
             tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : diskFallback?.tags || [],
@@ -63,7 +81,10 @@ async function readBlogs(): Promise<BlogPost[]> {
     const tmpRaw = await fs.readFile(TMP_BLOGS_PATH, "utf8");
     const parsed = JSON.parse(tmpRaw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      return parsed.map((item: BlogPost) => ({
+        ...item,
+        publishedDate: formatDate(item.publishedDate)
+      }));
     }
   } catch {}
 
@@ -72,7 +93,10 @@ async function readBlogs(): Promise<BlogPost[]> {
     const raw = await fs.readFile(BLOGS_FILE_PATH, "utf8");
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed;
+      return parsed.map((item: BlogPost) => ({
+        ...item,
+        publishedDate: formatDate(item.publishedDate)
+      }));
     }
   } catch (error) {
     console.error("Error reading blogs.json:", error);
