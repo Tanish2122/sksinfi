@@ -62,11 +62,11 @@ const NAV_ITEMS: NavItem[] = [
     subtitle: "Global NRI Advisory Services",
     children: [
       { label: "SKS INFI & NRI", href: "/sksinfi_nri" },
-      { label: "Loan", href: "/loan" },
-      { label: "Real Estate", href: "/real_estate" },
-      { label: "Investment", href: "/investment" },
-      { label: "Insurance", href: "/insurance" },
-      { label: "Tax & Compliances", href: "/accountstax" }
+      { label: "Home Loan", href: "/home_loan" },
+      { label: "Mutual Funds", href: "/mutual_funds" },
+      { label: "Bonds and G-Sec", href: "/govt-securities" },
+      { label: "Term Insurance", href: "/term" },
+      { label: "Health Insurance", href: "/health" }
     ]
   },
   {
